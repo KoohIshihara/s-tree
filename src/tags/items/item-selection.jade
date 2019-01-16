@@ -1,7 +1,8 @@
 item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
   div.wrap-node
     div.wrap-node-content.px8.py8
-      p.question-text.mb8 {questionText}
+      //p.question-text.mb8 {questionText}
+      textarea.question-text.mb8 {questionText}
       div.wrap-selections
         div(each='{item in selections}').wrap-text.f.fm.flex-between.mb8
           p.pl12.pr8 {item.label}
@@ -31,6 +32,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
         border: solid #2196F3 0.5px;
         .wrap-node-content {
           overflow: visible;
+          /*
           .question-text {
             color: #2196F3;
             text-align: center;
@@ -40,6 +42,10 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
             text-overflow: ellipsis;
             white-space: nowrap;
           }
+          */
+
+          
+
           .wrap-selections {
             display: inline-block;
             border-radius: 3px;
@@ -137,6 +143,26 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
     this.click = clickOnNode;
     this.over = moverTemplate;
     this.out = moutTemplate;
+
+
+    this.on('mount', function(){
+
+    });
+
+
+    this.updateQuestionText = function(self, e){
+
+      // hidden-textとtextareaを同期させて、動的にサイズが変化するtextareaを再現
+      var hiddenText = node.getElementsByClassName('hidden-text')[0];
+      hiddenText.innerHTML = e.target.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+
+      e.target.style.width = `${w+10}px`;
+      e.target.style.height = `${h}px`;
+
+    }
 
 
 

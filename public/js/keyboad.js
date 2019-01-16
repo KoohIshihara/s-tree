@@ -33,7 +33,7 @@ var keydown = function (e){
   
 }
 
-document.onkeydown = keydown;
+//document.onkeydown = keydown;
 
 
 

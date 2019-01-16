@@ -577,9 +577,9 @@ var mdownOnLineStart = function(e){
   // lineの始点を取得
   var button = event.target.getBoundingClientRect();
   // インスペクタの大きさ分を考慮
-  var leftOffset = document.querySelector('inspector').offsetWidth;
+  //var leftOffset = document.querySelector('inspector').offsetWidth;
   var buttonOffset = 16/2; // 8はボタンの半径
-  arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft - leftOffset;
+  arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft; //- leftOffset;
   arrowOrigin.y = button.top + buttonOffset + canvas.scrollTop-48;
 
 
@@ -611,8 +611,8 @@ var moveOnLineStart = function(e){
 
   // lineの終点の取得
   // インスペクタの大きさ分を考慮
-  var leftOffset = document.querySelector('inspector').offsetWidth;
-  arrowTo.x = e.pageX + canvas.scrollLeft - leftOffset;
+  //var leftOffset = document.querySelector('inspector').offsetWidth;
+  arrowTo.x = e.pageX + canvas.scrollLeft; //- leftOffset;
   arrowTo.y = e.pageY + canvas.scrollTop - 48;
 
   // プレヴュー用のlineを表示

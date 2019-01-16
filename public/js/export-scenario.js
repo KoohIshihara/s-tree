@@ -14,7 +14,7 @@ var exportCsv = function(){
   var url = (window.URL || window.webkitURL).createObjectURL(blob);
 
   var a = document.getElementById('downloader');
-  a.download = 'data.csv';
+  a.download = `${riot.currentProject.title}.csv`;//'data.csv';
   a.href = url;
 
   // ダウンロードリンクをクリックする
@@ -126,23 +126,26 @@ var convertScenarioArrayToCsv = function(){
           var nextNode = getEventFromScenarioById(nextId);
 
           // 次のノードがselectionだったら抜ける
-          if(nextNode.type=='selection' || !nextNode.next) break;
+          if(nextNode){
+            if(nextNode.type=='selection' || !(nextNode.next)) break;
 
-          // TODO: gotoNodeのexport
-          // 次のノードがgotoNodeなら
-          if(nextNode.type=='goto'){
-            
-            // gotoのexportやっているところ
-            nextNode = getEventFromScenarioById(nextNode.toId);
-          }
+            // TODO: gotoNodeのexport
+            // 次のノードがgotoNodeなら
+            if(nextNode.type=='goto'){
+              
+              // gotoのexportやっているところ
+              nextNode = getEventFromScenarioById(nextNode.toId);
+            }
 
-          // ノードがnormalで、かつnextもある場合、actionを足す
-          if(nextNode.type=='normal'){
-            resultToExportArray.push([`auto-${rootNodeId}.case1.action${automationNum}`,'automation_action','type','send_message','template',nextNode.next,'op','then']);
-            automationNum++;
+            // ノードがnormalで、かつnextもある場合、actionを足す
+            if(nextNode.type=='normal'){
+              resultToExportArray.push([`auto-${rootNodeId}.case1.action${automationNum}`,'automation_action','type','send_message','template',nextNode.next,'op','then']);
+              automationNum++;
+            }
           }
 
           currentNode = nextNode;
+          
         }
 
         // 改行

@@ -67,10 +67,13 @@ firebase.auth().onAuthStateChanged(function(user) {
     window.location.href = '/#login';
   }
 
-  if(location.hash!='#top'){
+  //if(location.hash!='#top'){
+  setTimeout(function(){
     $('#loading').fadeOut(400);
     $('#loadingForModal').fadeOut(400);
-  }
+  }, 1600);
+    
+  //}
 });
 
 

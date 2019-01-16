@@ -1,5 +1,6 @@
 {
   "projects": {
-    "s-tree": "scenario-tree"
+    "s-tree": "scenario-tree",
+    "default": "scenario-tree"
   }
 }
