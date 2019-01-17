@@ -261,12 +261,14 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
         //self.content.gui.topLinePosition.origin.y = y;
       }
 
-      // 変更をscenarioArrayに反映して保存
-      for(var i=0; i<scenarioArray.length; i++){
-        if(scenarioArray[i].id==content.id){
-          scenarioArray[i] = content;
-        }
-      }
+      //- // 変更をscenarioArrayに反映して保存
+      //- for(var i=0; i<scenarioArray.length; i++){
+      //-   if(scenarioArray[i].id==content.id){
+      //-     scenarioArray[i] = content;
+      //-   }
+      //- }
+
+      scenarioSetContent(scenarioArray, id, content);
 
       // textをシナリオデータに反映
       content.text = e.target.value;

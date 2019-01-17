@@ -36,7 +36,8 @@ atom-delete-node
       for(var i=0; i<preIndexesOfNomalNodes.length; i++){
         var index = preIndexesOfNomalNodes[i];
 
-        var lineName = `line-${scenarioArray[index.scenarioIndex].id}`;
+        //- var lineName = `line-${scenarioArray[index.scenarioIndex].id}`;
+        var lineName = `line-${scenarioGetId(scenarioArray, index.scenarioIndex)}`;
         var line = document.getElementById(lineName);
         if(line) line.parentNode.removeChild(line);
 
@@ -82,11 +83,13 @@ atom-delete-node
       var node = document.getElementById(selfNode.id);
       node.parentNode.removeChild(node);
 
-      var selfNodeIndex;
-      for(var i=0; i<scenarioArray.length; i++){
-        if(selfNode.id==scenarioArray[i].id) selfNodeIndex = i
-      }
-      scenarioArray.splice(selfNodeIndex, 1);
+      //- var selfNodeIndex;
+      //- for(var i=0; i<scenarioArray.length; i++){
+      //-   if(selfNode.id==scenarioArray[i].id) selfNodeIndex = i
+      //- }
+      //- scenarioArray.splice(selfNodeIndex, 1);
+
+      scenarioDeleteNode(scenarioArray, selfNode.id);
 
       // gotoのイベントのtoIdに指定されていた場合はリンクしているgotoも削除
       var gotoEvents = getEventOfGoToByToId(id);
