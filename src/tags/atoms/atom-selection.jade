@@ -1,0 +1,135 @@
+atom-selection.wrap-atom.wrap-text.f.fm.flex-between.mb8
+  //p.pl12.pr8 {label}
+  textarea(onkeyup='{updateSelectionText.bind(e, this)}').selection-textarea.pl12.pr8 {label}
+  p.hidden-label.pl12.pr8 {label}
+  div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+    div(data-selectionid='{id}').drag-button
+
+  style(scoped, type='less').
+    :scope {
+      /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
+      position: relative;
+      border: solid #2196F3 0.5px;
+      background: #fff;
+      border-radius: 3px;
+
+      .selection-textarea {
+        width: 100%;
+        color: #2196F3;
+        letter-spacing: 0.6px;
+        font-weight: 300;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        outline: none;
+        resize: none;
+      }
+
+      .hidden-label {
+        width: 100%;
+        color: #2196F3;
+        letter-spacing: 0.6px;
+        font-weight: 300;
+        text-align: center;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        word-break: break-all;
+        pointer-events: none;
+        /*visibility: hidden;*/
+      }
+
+      .wrap-drag-button {
+        cursor: pointer;
+        height: 34px;
+        .drag-button {
+          background: #2196F3;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+        }
+      }
+    
+      
+    }
+
+  script.
+
+    this.id = opts.selection.id;
+    this.label = opts.selection.label;
+
+    this.down = mdownOnLineStart;
+
+    // textareaを導入するぞーーー
+    this.updateSelectionText = function(self, e){
+
+      // エンターが押された時
+      if(e.keyCode==13){
+        var textarea = self.root.getElementsByClassName('selection-textarea')[0];
+        var text = textarea.value;
+        text = text.replace(/\r?\n/g, '');
+        textarea.value = text;
+      }
+
+      var node = document.getElementById(self.id);
+
+      // nodeのテキストを変更
+      var node = self.root;//document.getElementById(self.content.id);
+
+      var preWidth = node.offsetWidth;
+      var preHeight = node.offsetHeight;
+
+      // hidden-textとtextareaを同期させて、動的にサイズが変化するtextareaを再現
+      var hiddenText = node.getElementsByClassName('hidden-label')[0];
+      hiddenText.innerHTML = e.target.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+
+      e.target.style.width = `${w+20}px`;
+      e.target.style.height = `${h}px`;
+
+
+      /*
+      // 変更してずれる座標分の修正
+      var gapX = node.offsetWidth - preWidth;
+      var gapY = node.offsetHeight - preHeight;
+
+      // nodeの座標をtopLineが中心になるように修正
+      var content = getEventFromScenarioById(self.id);
+      var preNodePosY = content.gui.position.y;
+      content.gui.position.y = preNodePosY - gapY/2;
+      node.style.top = content.gui.position.y + 'px';
+
+      // 全てのtopLineの修正　
+      var selections = content.selections;
+      for(var i=0; i<selections.length; i++){
+        var id = selections[i].topLineId;
+        var topLine = document.getElementById(id);
+
+        var preY = parseInt(topLine.getAttribute('y1'));
+        var y = preY + gapY/2;
+        //debugger
+        topLine.setAttribute('y1', y);
+        selections[i].topLinePosition.origin.y = y;
+      }
+
+      // 変更をscenarioArrayに反映して保存
+      for(var i=0; i<scenarioArray.length; i++){
+        if(scenarioArray[i].id==content.id){
+          scenarioArray[i] = content;
+        }
+      }
+
+      // textをシナリオデータに反映
+      content.text = e.target.value;
+      */
+
+      // 入力中はセーブさせない
+      clearTimeout(self.saveTimer);
+      self.saveTimer = setTimeout(function(){
+        //saveScenarioAsSubcollection(self.content);
+      }, 800);
+
+    }

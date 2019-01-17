@@ -47,7 +47,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
 
             position: absolute;
             left: 0px;
-            top: 0px;
+            top: 4px;
             word-break: break-all;
             visibility: hidden;
             pointer-events: none;
@@ -179,7 +179,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       }
       */
 
-      // self.textを直接バインドすると改行が反映されないのでdomから操作する
+      // はじめのノードのtextareaの大きさをテキストの量によって調整
       var node = document.getElementById(self.id);
       var nodeText = node.getElementsByClassName('text')[0];
       if(self.text=='') self.text = 'Start Message';
@@ -207,16 +207,13 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
 
     this.updateText = function(self, e){
 
-      //e.preventDefault();
-
+      // エンターが押された時
       if(e.keyCode==13){
         var textarea = self.root.getElementsByClassName('textarea')[0];
         var text = textarea.value;
-        console.log(text);
-        text = text.replace(/\r?\n/g, '');;
+        text = text.replace(/\r?\n/g, '');
         textarea.value = text;
       }
-
 
 
       // nodeのテキストを変更
