@@ -39,6 +39,7 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
 
 
   // lineを追加
+  /*
   for(var i=0; i<scenarioArray.length; i++){
     var nodeType = scenarioArray[i].nodeType;
     if(nodeType == 'single'){
@@ -59,6 +60,91 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
           var topLineId = selections[selection_i].topLineId;
           addLine(from, to, topLineId);
         }
+      }
+    }
+  } // for
+  */
+
+  for(var i=0; i<scenarioArray.length; i++){
+    var event = scenarioArray[i];
+    var nodeType = scenarioArray[i].nodeType;
+    if(nodeType == 'single'){
+      
+      if(event.next){
+        var node = document.getElementById(event.id);
+        var boundingRect = node.getBoundingClientRect();
+        var from = {
+          x: event.gui.position.x + boundingRect.width + 8,
+          y: event.gui.position.y + boundingRect.height/2,
+        };
+
+        var nextId = event.next;
+        var nextEvent = getEventFromScenarioById(nextId);
+        var nextNode = document.getElementById(nextId);
+        var nextBoundingRect = nextNode.getBoundingClientRect();
+        var to = {
+          x: nextEvent.gui.position.x,
+          y: nextEvent.gui.position.y + nextBoundingRect.height/2,
+        };
+
+        var topLineId = event.gui.topLineId;
+
+        addLine(from, to, topLineId);
+      }
+      /*
+      if(scenarioArray[i].gui.topLinePosition){
+        var pos = scenarioArray[i].gui.topLinePosition;
+        var from = {x: pos.origin.x, y: pos.origin.y};
+        var to = {x: pos.to.x, y: pos.to.y};
+        var topLineId = scenarioArray[i].gui.topLineId;
+        addLine(from, to, topLineId);
+      }
+      */
+    }else if(nodeType == 'group'){
+      var event = getEventFromScenarioById(event.id);
+      var groupNodePos = event.gui.position;
+      var groupNode = document.getElementById(event.id);
+      var groupNodeBoundingRect = groupNode.getBoundingClientRect();
+
+      var selections = scenarioArray[i].selections;
+      for(var selection_i=0; selection_i<selections.length; selection_i++){
+
+        var selection = selections[selection_i];
+
+        if(selection.next){
+          
+          var node = document.getElementById(selection.id);
+          var boundingRect = node.getBoundingClientRect();
+          var relativePos = $(`#${selection.id}`).position();
+          var from = {
+            x: groupNodePos.x + groupNodeBoundingRect.width + 6,
+            y: groupNodePos.y + relativePos.top + boundingRect.height/2,
+          };
+
+          var nextId = selection.next;
+          var nextEvent = getEventFromScenarioById(nextId);
+          var nextNode = document.getElementById(nextId);
+          var nextBoundingRect = nextNode.getBoundingClientRect();
+          var to = {
+            x: nextEvent.gui.position.x,
+            y: nextEvent.gui.position.y + nextBoundingRect.height/2,
+          };
+
+          var topLineId = selection.topLineId;
+
+          addLine(from, to, topLineId);
+
+        }
+
+        /*
+        if(selections[selection_i].topLinePosition){
+          var pos = selections[selection_i].topLinePosition;
+          var from = {x: pos.origin.x, y: pos.origin.y};
+          var to = {x: pos.to.x, y: pos.to.y};
+          var topLineId = selections[selection_i].topLineId;
+          addLine(from, to, topLineId);
+        }
+        */
       }
     }
   } // for
@@ -578,7 +664,7 @@ var mdownOnLineStart = function(e){
   var button = event.target.getBoundingClientRect();
   // インスペクタの大きさ分を考慮
   //var leftOffset = document.querySelector('inspector').offsetWidth;
-  var buttonOffset = 16/2; // 8はボタンの半径
+  var buttonOffset = 8/2; //16/2; // 8はボタンの半径
   arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft; //- leftOffset;
   arrowOrigin.y = button.top + buttonOffset + canvas.scrollTop-48;
 

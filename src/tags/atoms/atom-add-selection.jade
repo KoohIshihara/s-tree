@@ -1,0 +1,81 @@
+atom-add-selection
+  div.wrap-atom.f.fh.py8
+    p(onclick='{addSelection}').label.pl7.pr8 ＋ Add Selection
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      cursor: pointer;
+      .wrap-atom {
+        .label {
+          /*text-align: center;*/
+          width: 100%;
+          font-weight: 300;
+          color: #2196F3;
+          font-size: 14px;
+          letter-spacing: 0.6px;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+    this.content = this.opts.content;
+
+    this.addSelection = function(){
+
+      var node = self.root;
+      var parentGroup = $(node).parents('.node')[0];
+      
+      var preWidth = parentGroup.offsetWidth;
+      var preHeight = parentGroup.offsetHeight;
+
+      // ノードを追加
+      var contentToAdd = {
+        label: 'Selection',
+        id: `selectionTmp${this.content.num}-selection${this.content.addedSelectionsCounter}`,
+      };
+      self.content.addedSelectionsCounter++;
+      self.content.selections.push(contentToAdd);
+      riot.update();
+
+      // フォーカスする
+      var addedSelection = document.getElementById(contentToAdd.id);
+      var textarea = addedSelection.getElementsByClassName('selection-textarea')[0];
+      textarea.focus();
+      textarea.select();
+
+      // 変更してずれる座標分の修正
+      var gapX = parentGroup.offsetWidth - preWidth;
+      var gapY = parentGroup.offsetHeight - preHeight;
+
+      // parentGroup
+      var content = getEventFromScenarioById(parentGroup.id);
+      var preNodePosY = content.gui.position.y;
+      content.gui.position.y = preNodePosY - gapY/2;
+      parentGroup.style.top = content.gui.position.y + 'px';
+
+      // 全てのtopLineの修正　
+      var selections = content.selections;
+      for(var i=0; i<selections.length; i++){
+        if(selections[i].next){
+          var topLineId = selections[i].topLineId;
+          var topLine = document.getElementById(topLineId);
+
+          var selectionNode = document.getElementById(selections[i].id);
+
+          var dragButton = selectionNode.children[2];
+          var absoluteTop = dragButton.getBoundingClientRect().top;
+
+          var y = absoluteTop + 16 + canvas.scrollTop - 48;
+
+          topLine.setAttribute('y1', y);
+          selections[i].topLinePosition.origin.y = y;
+        }
+
+        if(self.id==selections[i].id) self.selectionIndex = i;
+
+      }
+
+    }

@@ -1,11 +1,12 @@
 item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
   div.wrap-node
-    div.wrap-node-content.px8.py8
-      //p.question-text.mb8 {questionText}
-      textarea(onkeyup='{updateQuestionText.bind(e, this)}').question-textarea {questionText}
-      p.hidden-text {questionText}
+    div.wrap-node-content
+      div.wrap-question-text.px8.pt10.pb6
+        textarea(onkeyup='{updateQuestionText.bind(e, this)}').question-textarea {questionText}
+        p.hidden-text {questionText}
       div.wrap-selections
         atom-selection(each='{item in selections}' selection='{item}')
+        atom-add-selection(content='{content}')
   div.wrap-num
     p {num}
   div.wrap-icon.f.fh
@@ -23,11 +24,11 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
 
       .wrap-node {
         /*box-shadow: 1px 1px 4px rgba(0,0,0,0.4);*/
-        overflow: hidden;
+        overflow: visible;
         border-radius: 3px;
         /*background: #2196F3;*/
         background: #fff;
-        border: solid #2196F3 0.5px;
+        border: solid .6px rgba(0,0,0,0.2);
         .wrap-node-content {
           overflow: visible;
           /*
@@ -41,35 +42,39 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
             white-space: nowrap;
           }
           */
-          .hidden-text {
-            display: inline-block;
-            color: #2196F3;
-            letter-spacing: 0.6px;
-            font-weight: 300;
-            max-width: 180px;
+          .wrap-question-text {
+            border-bottom: solid .6px rgba(0,0,0,0.2);
+            .hidden-text {
+              display: inline-block;
+              color: #2a2a2a;
+              letter-spacing: 0.6px;
+              font-size: 14px;
+              font-weight: 400;
+              max-width: 180px;
 
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            word-break: break-all;
-            visibility: hidden;
-            pointer-events: none;
-          }
-          .question-textarea {
-            display: inline-block;
-            color: #2196F3;
-            letter-spacing: 0.6px;
-            font-weight: 300;
-            max-width: 180px;
+              position: absolute;
+              left: 0px;
+              top: 0px;
+              word-break: break-all;
+              visibility: hidden;
+              pointer-events: none;
+            }
+            .question-textarea {
+              display: inline-block;
+              color: #2a2a2a;
+              letter-spacing: 0.6px;
+              font-size: 14px;
+              font-weight: 400;
+              max-width: 180px;
 
-            outline: none;
-            resize: none;
-            height: 34px;
+              outline: none;
+              resize: none;
+              height: 34px;
+            }
           }
 
           .wrap-selections {
             display: inline-block;
-            border-radius: 3px;
             width: 100%;
             /*
             .wrap-text {
@@ -111,19 +116,20 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
 
       &.focused-node {
         .wrap-node {
-          border: solid #FF4081 2px !important;
+          border: solid #2196F3 0.8px !important;
           box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         }
       }
 
       .wrap-num {
         position: absolute;
-        left: 4px;
-        top: -20px;
+        left: 2px;
+        top: -18px;
         p {
-          font-size: 14px;
+          font-size: 12px;
+          font-weight: 300;
           text-align: center;
-          color: #2196F3;
+          color: #999;
         }
       }
 
@@ -146,6 +152,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
 
     var self = this;
 
+    this.content = this.opts.content;
     this.id = this.opts.content.id; //"selection";
     this.questionText = this.opts.content.text; //'How are you?';
     this.selections = this.opts.content.selections;
@@ -236,11 +243,13 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
         var id = selections[i].topLineId;
         var topLine = document.getElementById(id);
 
-        var preY = parseInt(topLine.getAttribute('y1'));
-        var y = preY + gapY/2;
-        //debugger
-        topLine.setAttribute('y1', y);
-        selections[i].topLinePosition.origin.y = y;
+        if(topLine){
+          var preY = parseInt(topLine.getAttribute('y1'));
+          var y = preY + gapY/2;
+          //debugger
+          topLine.setAttribute('y1', y);
+          selections[i].topLinePosition.origin.y = y;
+        }
       }
 
       // 変更をscenarioArrayに反映して保存

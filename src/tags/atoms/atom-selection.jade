@@ -1,7 +1,7 @@
-atom-selection.wrap-atom.wrap-text.f.fm.flex-between.mb8
+atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
   //p.pl12.pr8 {label}
-  textarea(onkeyup='{updateSelectionText.bind(e, this)}').selection-textarea.pl12.pr8 {label}
-  p.hidden-label.pl12.pr8 {label}
+  textarea(onkeyup='{updateSelectionText.bind(e, this)}').selection-textarea.px8 {label}
+  p.hidden-label.px8 {label}
   div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
     div(data-selectionid='{id}').drag-button
 
@@ -9,44 +9,48 @@ atom-selection.wrap-atom.wrap-text.f.fm.flex-between.mb8
     :scope {
       /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
       position: relative;
-      border: solid #2196F3 0.5px;
-      background: #fff;
-      border-radius: 3px;
+      border-bottom: solid .6px rgba(0,0,0,0.2);
+      background: rgba(0,0,0,0);
 
       .selection-textarea {
+        font-size: 14px;
         width: 100%;
-        color: #2196F3;
+        color: #2a2a2a;
         letter-spacing: 0.6px;
-        font-weight: 300;
-        text-align: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        font-weight: 100;
         outline: none;
         resize: none;
+
+        min-height: 16px;
       }
 
       .hidden-label {
+        display: inline-block;
         width: 100%;
-        color: #2196F3;
+        color: #2a2a2a;
         letter-spacing: 0.6px;
-        font-weight: 300;
-        text-align: center;
+        font-weight: 100;
+        font-size: 14px;
         position: absolute;
         left: 0px;
         top: 0px;
         word-break: break-all;
         pointer-events: none;
-        /*visibility: hidden;*/
+        visibility: hidden;
       }
 
       .wrap-drag-button {
+        position: absolute;
         cursor: pointer;
-        height: 34px;
+        top: 0;
+        left: calc(~'100% + 6px');
+        z-index: 10;
+        height: 100%;
+        cursor: pointer;
         .drag-button {
           background: #2196F3;
-          width: 16px;
-          height: 16px;
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
         }
       }
@@ -56,80 +60,187 @@ atom-selection.wrap-atom.wrap-text.f.fm.flex-between.mb8
 
   script.
 
+    var self = this;
+
     this.id = opts.selection.id;
     this.label = opts.selection.label;
 
     this.down = mdownOnLineStart;
 
-    // textareaを導入するぞーーー
+    this.on('mount', function(){
+      
+      var selectionTextarea = self.root.getElementsByClassName('selection-textarea')[0];
+      var hiddenText = self.root.getElementsByClassName('hidden-label')[0];
+      hiddenText.innerHTML = selectionTextarea.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+
+      selectionTextarea.style.width = `${w}px`;
+      selectionTextarea.style.height = `${h}px`;
+
+      // フォーカスする
+      //selectionTextarea.focus();
+      //selectionTextarea.select();
+
+    });
+
+    self.letDeleteSelf = false;
     this.updateSelectionText = function(self, e){
 
+      var textarea = self.root.getElementsByClassName('selection-textarea')[0];
       // エンターが押された時
       if(e.keyCode==13){
-        var textarea = self.root.getElementsByClassName('selection-textarea')[0];
         var text = textarea.value;
         text = text.replace(/\r?\n/g, '');
         textarea.value = text;
       }
 
-      var node = document.getElementById(self.id);
+      // デリートが押されて、なおかつtextareaの中身が空になった時
+      if(e.keyCode==8 && textarea.value==''){
+        // 空の状態で押されたデリートが2回目なら選択肢を消す
+        if(self.letDeleteSelf){
+
+          // selectionのデータを削除
+          var selection = getNodeFromScenarioById(self.id);
+          var groupId = selection.id.split('-')[0];
+          var event = getEventFromScenarioById(groupId);
+
+          for(var i=0; i<event.selections.length; i++){
+            if(event.selections[i].id == self.id){
+              event.selections.splice(i, 1);
+            }
+          }
+
+
+          // 位置ずれを修正
+          var parentGroup = $(self.root).parents('.node')[0];
+          
+          var preWidth = parentGroup.offsetWidth;
+          var preHeight = parentGroup.offsetHeight;
+
+          // 要素を削除
+          self.root.parentNode.removeChild(self.root);
+
+          // 線を削除
+          var line = document.getElementById(`line-${self.id}`);
+          if(line) line.parentNode.removeChild(line);
+
+          var gapX = parentGroup.offsetWidth - preWidth;
+          var gapY = parentGroup.offsetHeight - preHeight;
+
+          // parentGroup
+          var content = getEventFromScenarioById(parentGroup.id);
+          var preNodePosY = content.gui.position.y;
+          content.gui.position.y = preNodePosY - gapY/2;
+          parentGroup.style.top = content.gui.position.y + 'px';
+
+          // 全てのtopLineの修正　
+          var selections = content.selections;
+          for(var i=0; i<selections.length; i++){
+            if(selections[i].next){
+              var topLineId = selections[i].topLineId;
+              var topLine = document.getElementById(topLineId);
+
+              var groupId = parentGroup.id;
+              var groupEvent = getEventFromScenarioById(groupId);
+
+              var selection = selections[i];
+              var relativePos = $(`#${selection.id}`).position();
+
+              var nodeOfSelection = document.getElementById(selection.id);
+              var boundingRect = nodeOfSelection.getBoundingClientRect();
+
+              var y = groupEvent.gui.position.y + relativePos.top + boundingRect.height/2;
+
+              topLine.setAttribute('y1', y);
+              selections[i].topLinePosition.origin.y = y;
+            }
+
+            if(self.id==selections[i].id) self.selectionIndex = i;
+          }
+
+
+          // 一個前の選択肢をフォーカス
+          var preSelection = event.selections[event.selections.length-1];
+          if(preSelection){
+            var preNode = document.getElementById(preSelection.id);
+            preNode.firstChild.focus();
+          }
+
+
+          return;
+        }
+        self.letDeleteSelf = true;
+      }
+
+      var node = self.root;
+      var parentGroup = $(node).parents('.node')[0];
+      
+      var preWidth = parentGroup.offsetWidth;
+      var preHeight = parentGroup.offsetHeight;
 
       // nodeのテキストを変更
-      var node = self.root;//document.getElementById(self.content.id);
-
-      var preWidth = node.offsetWidth;
-      var preHeight = node.offsetHeight;
-
-      // hidden-textとtextareaを同期させて、動的にサイズが変化するtextareaを再現
+      // hidden-textとtextareaを同期させseoて、動的にサイズが変化するtextareaを再現
       var hiddenText = node.getElementsByClassName('hidden-label')[0];
       hiddenText.innerHTML = e.target.value;
 
       var w = hiddenText.offsetWidth;
       var h = hiddenText.offsetHeight;
 
-      e.target.style.width = `${w+20}px`;
+      e.target.style.width = `${w}px`;
       e.target.style.height = `${h}px`;
 
 
-      /*
       // 変更してずれる座標分の修正
-      var gapX = node.offsetWidth - preWidth;
-      var gapY = node.offsetHeight - preHeight;
+      var gapX = parentGroup.offsetWidth - preWidth;
+      var gapY = parentGroup.offsetHeight - preHeight;
 
-      // nodeの座標をtopLineが中心になるように修正
-      var content = getEventFromScenarioById(self.id);
+      // parentGroup
+      var content = getEventFromScenarioById(parentGroup.id);
       var preNodePosY = content.gui.position.y;
       content.gui.position.y = preNodePosY - gapY/2;
-      node.style.top = content.gui.position.y + 'px';
+      parentGroup.style.top = content.gui.position.y + 'px';
 
-      // 全てのtopLineの修正　
+      // 全てのtopLineの修正
       var selections = content.selections;
       for(var i=0; i<selections.length; i++){
-        var id = selections[i].topLineId;
-        var topLine = document.getElementById(id);
+        if(selections[i].next){
+          var topLineId = selections[i].topLineId;
+          var topLine = document.getElementById(topLineId);
 
-        var preY = parseInt(topLine.getAttribute('y1'));
-        var y = preY + gapY/2;
-        //debugger
-        topLine.setAttribute('y1', y);
-        selections[i].topLinePosition.origin.y = y;
+          var groupId = parentGroup.id;
+          var groupEvent = getEventFromScenarioById(groupId);
+
+          var selection = selections[i];
+          var relativePos = $(`#${selection.id}`).position();
+
+          var nodeOfSelection = document.getElementById(selection.id);
+          var boundingRect = nodeOfSelection.getBoundingClientRect();
+
+          var y = groupEvent.gui.position.y + relativePos.top + boundingRect.height/2;
+
+          topLine.setAttribute('y1', y);
+          selections[i].topLinePosition.origin.y = y;
+        }
+
+        if(self.id==selections[i].id) self.selectionIndex = i;
       }
+
+      content.selections[self.selectionIndex].label = e.target.value;
 
       // 変更をscenarioArrayに反映して保存
       for(var i=0; i<scenarioArray.length; i++){
         if(scenarioArray[i].id==content.id){
           scenarioArray[i] = content;
         }
-      }
-
-      // textをシナリオデータに反映
-      content.text = e.target.value;
-      */
+      }      
+      
 
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);
       self.saveTimer = setTimeout(function(){
-        //saveScenarioAsSubcollection(self.content);
+        saveScenarioAsSubcollection(self.content);
       }, 800);
 
     }

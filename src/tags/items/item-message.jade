@@ -2,10 +2,12 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
   div.wrap-node
     div.wrap-node-content.f.fm.flex-between.py4
       //p.text.line-clamp-1.pl12.pr8.pt8.pb7 
-      textarea(onkeyup='{updateText.bind(e, this)}').textarea.pl12 {text}
-      p.text.hidden-text.pl12 {text}
-      div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+      textarea(onkeyup='{updateText.bind(e, this)}').textarea.px12 {text}
+      p.text.hidden-text.px12 {text}
+      //div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
         div.drag-button
+  div(onmousedown='{down}').wrap-drag-button.f.fm
+    div.drag-button
   div.wrap-num
     p {num}
   div.wrap-icon.f.fh
@@ -23,7 +25,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       cursor: grab;
 
       .wrap-node {
-        border: solid #2196F3 0.5px;
+        border: solid rgba(0,0,0,0.2) 0.5px;
         border-radius: 3px;
         overflow: hidden;
         position: relative;
@@ -40,9 +42,9 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
           .text {
             /*white-space: nowrap;*/
             display: inline-block;
-            color: #2196F3;
+            color: #2a2a2a;
             letter-spacing: 0.6px;
-            font-weight: 300;
+            font-weight: 400;
             max-width: 180px;
 
             position: absolute;
@@ -54,17 +56,19 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
           }
           .textarea {
             display: inline-block;
-            color: #2196F3;
+            color: #2a2a2a;
             letter-spacing: 0.6px;
-            font-weight: 300;
+            font-weight: 400;
             width: 100%;
+            min-width: 14px;
             max-width: 180px;
+            min-height: 19px;
 
             outline: none;
             resize: none;
             height: 34px;
           }
-
+          /*
           .wrap-drag-button {
             cursor: pointer;
             height: 34px;
@@ -75,9 +79,27 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
               border-radius: 50%;
             }
           }
+          */
         } /* .wrap-node-content */
 
       } /*wrap-node*/
+
+
+      .wrap-drag-button {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: calc(~'100% + 6px');
+        z-index: 10;
+        height: 100%;
+        cursor: pointer;
+        .drag-button {
+          background: #2196F3;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+        }
+      }
 
       .start-node-overlay {
         position: absolute;
@@ -108,20 +130,20 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
 
       &.focused-node {
         .wrap-node {
-          border: solid #FF4081 2px !important;
+          border: solid #2196F3 0.8px !important;
           box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         }
       }
 
       .wrap-num {
         position: absolute;
-        z-index: 2;
-        left: 4px;
-        top: -20px;
+        left: 2px;
+        top: -18px;
         p {
-          font-size: 14px;
+          font-size: 12px;
+          font-weight: 300;
           text-align: center;
-          color: #2196F3;
+          color: #999;
         }
       }
 
@@ -159,8 +181,11 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
 
     var self = this;
 
+    this.content = this.opts.content;
+
     this.id = this.opts.content.id;
     this.text = this.opts.content.text;
+    this.next = this.opts.content.next;
     this.num = this.opts.content.num;
 
     this.down = mdownOnLineStart;
@@ -213,6 +238,9 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
         var text = textarea.value;
         text = text.replace(/\r?\n/g, '');
         textarea.value = text;
+
+        //if(self.content.gui.topLine==undefined) addNewSimpleMessageViaCommand();
+        addNewSimpleMessageViaCommand();
       }
 
 
@@ -233,7 +261,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       var w = hiddenText.offsetWidth;
       var h = hiddenText.offsetHeight;
 
-      e.target.style.width = `${w+10}px`;
+      e.target.style.width = `${w+4}px`;
       e.target.style.height = `${h}px`;
 
 
