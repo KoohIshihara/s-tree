@@ -116,11 +116,12 @@ atom-selection.wrap-atom.wrap-text.f.fm.flex-between.mb8
       }
 
       // 変更をscenarioArrayに反映して保存
-      for(var i=0; i<scenarioArray.length; i++){
-        if(scenarioArray[i].id==content.id){
-          scenarioArray[i] = content;
-        }
-      }
+      //- for(var i=0; i<scenarioArray.length; i++){
+      //-   if(scenarioArray[i].id==content.id){
+      //-     scenarioArray[i] = content;
+      //-   }
+      //- }
+      scenarioUpdateContent(scenarioArray, content.id, content);
 
       // textをシナリオデータに反映
       content.text = e.target.value;

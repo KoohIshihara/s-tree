@@ -1,6 +1,6 @@
 // キーボードイベント
 var keydown = function (e){
-  
+
   //e.preventDefault();
 
   if((e.ctrlKey || e.metaKey)) {
@@ -13,16 +13,16 @@ var keydown = function (e){
         if(currentFocusedEvent) addNewSimpleMessageViaCommand();
       break
 
-      case 'r': 
-        window.location.reload();  
+      case 'r':
+        window.location.reload();
       break;
-      case 's': 
+      case 's':
         saveScenarioAsSubcollection();
       break;
-      case 'y': 
+      case 'y':
         redoCanvas();
       break;
-      case 'z': 
+      case 'z':
         undoCanvas();
       break;
 
@@ -30,7 +30,7 @@ var keydown = function (e){
 
     return false;
   }
-  
+
 }
 
 //document.onkeydown = keydown;
@@ -38,13 +38,13 @@ var keydown = function (e){
 
 
 var addNewSimpleMessageViaCommand = function(){
-  
+
   console.log(currentFocusedEvent);
 
   var focusedNode = document.getElementById(currentFocusedEvent.id);
   var newPosX = currentFocusedEvent.gui.position.x + focusedNode.offsetWidth + 50;
   var newPosY = currentFocusedEvent.gui.position.y + focusedNode.offsetHeight/2;
-  
+
   var content = {
     author: session.user.uid,
     id: `simpleTmp${riot.currentProject.nodeNum}`,
@@ -86,10 +86,31 @@ var addNewSimpleMessageViaCommand = function(){
 // scenarioArrayになくて変更先の履歴にノードがある場合はそのノードを追加
 // scenarioArrayにも変更先の履歴にもあるけど、差が生じているノードはcanvasから削除して再描画
 
-var undoCanvas = function() {
+// var undoCanvas = function() {
+//
+//   if(currentHistoryIndex < scenarioHistories.length) currentHistoryIndex++;
+//   if(scenarioHistories[scenarioHistories.length-currentHistoryIndex]){
+//     $(canvasNodes).empty();
+//     $(canvasSvg).empty();
+//
+//     var lineForPreview = document.createElementNS('http://www.w3.org/2000/svg','line');
+//     lineForPreview.id = 'lineForPreview';
+//     canvasSvg.append(lineForPreview);
+//
+//     var array = scenarioHistories[scenarioHistories.length-currentHistoryIndex];
+//     scenarioArray = array.slice(0, array.length);
+//
+//     var firstEventName = `first-${riot.currentProject.id}`;
+//     loadCanvas(firstEventName, false);
+//
+//     //saveScenarioAsSubcollection();
+//   }
+//
+// }
 
-  if(currentHistoryIndex < scenarioHistories.length) currentHistoryIndex++;
-  if(scenarioHistories[scenarioHistories.length-currentHistoryIndex]){
+var undoCanvas = function () {
+  currentHistoryIndex = scenarioHistoriesIncrementIndex(scenarioHistories, currentHistoryIndex);
+  if (scenarioHistoriesIsHistoryAvailable(scenarioHistories, currentHistoryIndex)) {
     $(canvasNodes).empty();
     $(canvasSvg).empty();
 
@@ -97,21 +118,38 @@ var undoCanvas = function() {
     lineForPreview.id = 'lineForPreview';
     canvasSvg.append(lineForPreview);
 
-    var array = scenarioHistories[scenarioHistories.length-currentHistoryIndex];
-    scenarioArray = array.slice(0, array.length);
+    scenarioArray = scenarioHistoriesGetHistory(scenarioHistories, currentHistoryIndex);
 
     var firstEventName = `first-${riot.currentProject.id}`;
     loadCanvas(firstEventName, false);
-
-    //saveScenarioAsSubcollection();
   }
-
 }
 
-var redoCanvas = function() {
+// var redoCanvas = function() {
+//
+//   if(currentHistoryIndex > 0) currentHistoryIndex--;
+//   if(scenarioHistories[scenarioHistories.length-currentHistoryIndex]){
+//     $(canvasNodes).empty();
+//     $(canvasSvg).empty();
+//
+//     var lineForPreview = document.createElementNS('http://www.w3.org/2000/svg','line');
+//     lineForPreview.id = 'lineForPreview';
+//     canvasSvg.append(lineForPreview);
+//
+//     var array = scenarioHistories[scenarioHistories.length-currentHistoryIndex];
+//     scenarioArray = array.slice(0, array.length);
+//
+//     var firstEventName = `first-${riot.currentProject.id}`;
+//     loadCanvas(firstEventName, false);
+//
+//     //saveScenarioAsSubcollection();
+//   }
+//
+// }
 
-  if(currentHistoryIndex > 0) currentHistoryIndex--;
-  if(scenarioHistories[scenarioHistories.length-currentHistoryIndex]){
+var redoCanvas = function () {
+  currentHistoryIndex = scenarioHistoriesDecrementIndex(scenarioHistories, currentHistoryIndex);
+  if (scenarioHistoriesIsHistoryAvailable(scenarioHistories, currentHistoryIndex)) {
     $(canvasNodes).empty();
     $(canvasSvg).empty();
 
@@ -119,19 +157,9 @@ var redoCanvas = function() {
     lineForPreview.id = 'lineForPreview';
     canvasSvg.append(lineForPreview);
 
-    var array = scenarioHistories[scenarioHistories.length-currentHistoryIndex];
-    scenarioArray = array.slice(0, array.length);
+    scenarioArray = scenarioHistoriesGetHistory(scenarioHistories, currentHistoryIndex);
 
     var firstEventName = `first-${riot.currentProject.id}`;
     loadCanvas(firstEventName, false);
-
-    //saveScenarioAsSubcollection();
   }
-
 }
-
-
-
-
-
-

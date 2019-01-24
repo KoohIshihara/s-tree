@@ -26,10 +26,12 @@
     "gulp-sort": "^2.0.0",
     "gulp-util": "^3.0.3",
     "ip": "^0.3.3",
+    "jest": "^23.6.0",
     "less": "^2.7.2",
     "pug": "^2.0.0-beta11"
   },
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "jest"
   }
 }

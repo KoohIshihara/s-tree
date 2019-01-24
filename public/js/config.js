@@ -13,3 +13,5 @@ var session = {};
 var service = {};
 
 service.db = firebase.firestore();
+
+module = { exports: {} }

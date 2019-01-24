@@ -132,7 +132,7 @@ module-inspector-selection
       //-   }
       //- }
 
-      scenarioSetContent(scenarioArray, self.content.id, self.content);
+      scenarioUpdateContent(scenarioArray, self.content.id, self.content);
       
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);
@@ -182,16 +182,15 @@ module-inspector-selection
       }
 
       // 変更をscenarioArrayに反映して保存
-      for(var i=0; i<scenarioArray.length; i++){
-        if(scenarioArray[i].id==self.content.id){
-          scenarioArray[i] = self.content;
-        }
-      }
+      //- for(var i=0; i<scenarioArray.length; i++){
+      //-   if(scenarioArray[i].id==self.content.id){
+      //-     scenarioArray[i] = self.content;
+      //-   }
+      //- }
+      scenarioUpdateContent(myScenario, self.content.id, self.content);
 
       //saveScenario();
       saveScenarioAsSubcollection(self.content);
       
     }
     */
-
-

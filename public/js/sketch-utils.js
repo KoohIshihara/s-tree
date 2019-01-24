@@ -53,7 +53,7 @@ async function saveScenarioAsSubcollection(scenarioObj){
     .collection('scenario')
     .get()
     .then(function(doc) {
-      var resultScenario = [];     
+      var resultScenario = [];
       for(var i=0; i<doc.docs.length; i++){
         //var data = doc.docs[i].data();
         resultScenario.push(doc.docs[i].data());
@@ -65,7 +65,7 @@ async function saveScenarioAsSubcollection(scenarioObj){
   for(var i=0; i<scenarioOfDatabase.length; i++){
 
     var eventOfClient = getEventFromScenarioById(scenarioOfDatabase[i].id);
-    
+
     // clientにないノードはデータベース側からも削除する
     if(eventOfClient==undefined){
       service.db.collection('projects').doc(riot.currentProjectId)
@@ -98,21 +98,22 @@ async function saveScenarioAsSubcollection(scenarioObj){
 
 // 履歴の管理
 var currentHistoryIndex = 0;
-var addHistory = function(){
-  //var history = scenarioArray.slice(0, scenarioArray.length);
-  //scenarioHistories.push(history);
+// var addHistory = function(){
+//   //var history = scenarioArray.slice(0, scenarioArray.length);
+//   //scenarioHistories.push(history);
+//
+//   if(scenarioHistories.length > 10) scenarioHistories.shift();
+//
+//   var history = JSON.stringify(scenarioArray);
+//   scenarioHistories.push(JSON.parse(history));
+//
+//   currentHistoryIndex = 0;
+// }
 
-  if(scenarioHistories.length > 10) scenarioHistories.shift();
-
-  var history = JSON.stringify(scenarioArray);
-  scenarioHistories.push(JSON.parse(history));
-
+var addHistory = function () {
+  scenarioHistoriesAddHistory(scenarioHistories, scenarioArray);
   currentHistoryIndex = 0;
 }
-
-
-
-
 
 // ノードの上にドラッグ中のカーソルがのっているかを判定
 var isOverTemplate = false;
@@ -163,7 +164,7 @@ var getNodeFromScenarioById = function(id){
   var node;
   for(var i=0; i<scenarioArray.length; i++){
     if(scenarioArray[i].nodeType == 'single'){
-      
+
       if(scenarioArray[i].id == id) node = scenarioArray[i];
 
     }else if(scenarioArray[i].nodeType == 'group'){

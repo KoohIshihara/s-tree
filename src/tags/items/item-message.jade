@@ -268,7 +268,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       //-   }
       //- }
 
-      scenarioSetContent(scenarioArray, id, content);
+      scenarioUpdateContent(scenarioArray, content.id, content);
 
       // textをシナリオデータに反映
       content.text = e.target.value;
@@ -282,5 +282,3 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
 
 
     }
-
-
