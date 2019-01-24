@@ -66,7 +66,7 @@ module-modal-create-project
         title: projectTitle,
         createdAt: new Date(),
         editedAt: new Date(),
-        nodeNum: 1,
+        nodeNum: 2,
       };
 
       var id = await service.db.collection("projects")
@@ -80,23 +80,6 @@ module-modal-create-project
         });
 
       /*
-      // はじめのイベントを追加してシナリオの初期化
-      await service.db.collection("projects").doc(id)
-        .update({'scenario': [
-            {
-              id: `first-${id}`,
-              type: 'normal',
-              nodeType: 'single',
-              text: 'Hello',
-              num: 0,
-              gui: {
-                position: {x: 150, y: 100000/2}
-              }
-            },
-          ]
-        });
-      */
-
       await service.db.collection("projects").doc(id)
         .collection('scenario')
         .doc(`first-${id}`)
@@ -109,6 +92,39 @@ module-modal-create-project
           num: 0,
           gui: {
             position: {x: 150, y: 100000/2}
+          }
+        });
+      */
+
+      await service.db.collection("projects").doc(id)
+        .collection('scenario')
+        .doc(`start-point-${id}`)
+        .set({
+          author: session.user.uid,
+          id: `start-point-${id}`,
+          type: 'start-point',
+          nodeType: 'point',
+          next: `first-${id}`,
+          text: 'Start Point',
+          num: 0,
+          gui: {
+            position: {x: 100, y: 100000/2},
+            topLineId: `line-start-point-${id}`
+          }
+        });
+
+      await service.db.collection("projects").doc(id)
+        .collection('scenario')
+        .doc(`first-${id}`)
+        .set({
+          author: session.user.uid,
+          id: `first-${id}`,
+          type: 'normal',
+          nodeType: 'single',
+          text: 'Hello',
+          num: 1,
+          gui: {
+            position: {x: 200, y: 100000/2-10}
           }
         });
 

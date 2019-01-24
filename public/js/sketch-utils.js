@@ -183,7 +183,7 @@ var getNormalNodesFromScenarioByNext = function(next){
 
   var resultNodes = [];
   for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
+    if((scenarioArray[i].nodeType=='single' || scenarioArray[i].nodeType=='point') && scenarioArray[i].next == next){
       resultNodes.push(scenarioArray[i]);
     }
   }

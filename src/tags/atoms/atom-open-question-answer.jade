@@ -1,0 +1,146 @@
+atom-open-question-answer
+  div.wrap-text.f.fm.flex-between.mt6.mb8
+    //p.expected-answer.pl8.pr8 {expectedAnswer}
+    textarea(onkeyup='{updateText.bind(e, this)}').textarea.px8 {expectedAnswer}
+    p.hidden-label.px8 {expectedAnswer}
+    div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+      div(data-selectionid='{id}').drag-button
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      width: 100%;
+      .wrap-text {
+        position: relative;
+        /*
+        p {
+          width: 100%;
+          color: #999;
+          letter-spacing: 0.6px;
+          font-size: 14px;
+          font-weight: 300;
+          text-align: center;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        */
+
+        .textarea {
+          font-size: 14px;
+          width: 100%;
+          color: #999;
+          letter-spacing: 0.6px;
+          font-weight: 100;
+          outline: none;
+          resize: none;
+
+          min-height: 16px;
+        }
+
+        .hidden-label {
+          display: inline-block;
+          width: 100%;
+          color: #999;
+          letter-spacing: 0.6px;
+          font-weight: 100;
+          font-size: 14px;
+          position: absolute;
+          left: 0px;
+          top: 0px;
+          word-break: break-all;
+          pointer-events: none;
+          visibility: hidden;
+        }
+
+        .wrap-drag-button {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: calc(~'100% + 6px');
+          z-index: 10;
+          height: 100%;
+          cursor: pointer;
+          .drag-button {
+            background: #2196F3;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+          }
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.expectedAnswer = opts.expected;
+    this.id = opts.id;
+
+    this.down = mdownOnLineStart;
+
+    this.on('mount', function(){
+      
+      var textarea = self.root.getElementsByClassName('textarea')[0];
+      var hiddenText = self.root.getElementsByClassName('hidden-label')[0];
+      hiddenText.innerHTML = textarea.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+
+      textarea.style.width = `${w}px`;
+      textarea.style.height = `${h}px`;
+
+    });
+
+    this.updateText = function(self, e){
+
+      var textarea = self.root.getElementsByClassName('textarea')[0];
+
+      // エンターが押された時
+      if(e.keyCode==13){
+        var text = textarea.value;
+        text = text.replace(/\r?\n/g, '');
+        textarea.value = text;
+      }
+
+      var node = self.root;
+      var parentGroup = $(node).parents('.node')[0];
+      
+      var preWidth = parentGroup.offsetWidth;
+      var preHeight = parentGroup.offsetHeight;
+
+      // nodeのテキストを変更
+      // hidden-textとtextareaを同期させseoて、動的にサイズが変化するtextareaを再現
+      var hiddenText = node.getElementsByClassName('hidden-label')[0];
+      hiddenText.innerHTML = e.target.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+
+      e.target.style.width = `${w}px`;
+      e.target.style.height = `${h}px`;
+
+
+      // 変更してずれる座標分の修正
+      var gapX = parentGroup.offsetWidth - preWidth;
+      var gapY = parentGroup.offsetHeight - preHeight;
+
+      // parentGroup
+      var content = getEventFromScenarioById(parentGroup.id);
+      var preNodePosY = content.gui.position.y;
+      content.gui.position.y = preNodePosY - gapY/2;
+      parentGroup.style.top = content.gui.position.y + 'px';
+
+      content.expectedAnswer = textarea.value;
+
+      // 入力中はセーブさせない
+      clearTimeout(self.saveTimer);
+      self.saveTimer = setTimeout(function(){
+        saveScenarioAsSubcollection(self.content);
+      }, 800);
+
+    }
+
+

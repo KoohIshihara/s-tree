@@ -1,0 +1,31 @@
+item-start-point(id='{id}' data-id='{id}').node
+  div(onmousedown='{down}').wrap-drag-button.f.fm
+    div.drag-button
+
+  style(scoped, type='less').
+    :scope {
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 20px;
+      top: 50000px;
+      left: 100px;
+      .wrap-drag-button {
+        cursor: pointer;
+        z-index: 10;
+        cursor: pointer;
+        .drag-button {
+          background: #2196F3;
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+        }
+      }
+    }
+
+  script.
+
+    this.down = mdownOnLineStart;
+
+    var projectId = location.hash.split('/')[1];
+    this.id = `start-point-${projectId}`;

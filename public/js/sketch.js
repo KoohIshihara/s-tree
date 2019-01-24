@@ -74,7 +74,7 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
         var node = document.getElementById(event.id);
         var boundingRect = node.getBoundingClientRect();
         var from = {
-          x: event.gui.position.x + boundingRect.width + 8,
+          x: event.gui.position.x + boundingRect.width + 10,
           y: event.gui.position.y + boundingRect.height/2,
         };
 
@@ -117,7 +117,7 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
           var boundingRect = node.getBoundingClientRect();
           var relativePos = $(`#${selection.id}`).position();
           var from = {
-            x: groupNodePos.x + groupNodeBoundingRect.width + 6,
+            x: groupNodePos.x + groupNodeBoundingRect.width + 8,
             y: groupNodePos.y + relativePos.top + boundingRect.height/2,
           };
 
@@ -146,6 +146,28 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
         }
         */
       }
+    }else if(nodeType == 'point'){
+      if(event.next){
+        var node = document.getElementById(event.id);
+        var boundingRect = node.getBoundingClientRect();
+        var from = {
+          x: 100 + 14/2,
+          y: 100000/2 + 14/2,
+        };
+
+        var nextId = event.next;
+        var nextEvent = getEventFromScenarioById(nextId);
+        var nextNode = document.getElementById(nextId);
+        var nextBoundingRect = nextNode.getBoundingClientRect();
+        var to = {
+          x: nextEvent.gui.position.x,
+          y: nextEvent.gui.position.y + nextBoundingRect.height/2,
+        };
+
+        var topLineId = event.gui.topLineId;
+
+        addLine(from, to, topLineId);
+      }
     }
   } // for
 
@@ -161,7 +183,7 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
 
 var addSimpleMessage = function(x, y, content, isLoading){
   // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='single'){
+  if(!(isLoading) && targetEvent && (targetEvent.nodeType=='single' || targetEvent.nodeType=='point')){
     targetEvent.next = content.id;
   }
 
@@ -278,7 +300,7 @@ var addSelections = function(x, y, content, isLoading){
 
 var addOpenQuestion = function(x, y, content, isLoading){
   // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='single'){
+  if(!(isLoading) && targetEvent && (targetEvent.nodeType=='single' || targetEvent.nodeType=='point')){
     targetEvent.next = content.id;
   }
 
@@ -551,12 +573,11 @@ var mmoveOnNode = function(e) {
   // 次のテンプレートにつないでいるlineの始点を修正
   var topLine = document.querySelector(`#${targetEvent.gui.topLineId}`);//targetEvent.gui.topLine;
   if(topLine){
-    targetEvent.gui.topLinePosition.origin.x += gapX;
-    targetEvent.gui.topLinePosition.origin.y += gapY;
+    //targetEvent.gui.topLinePosition.origin.x += gapX;
+    //targetEvent.gui.topLinePosition.origin.y += gapY;
     
     topLine.setAttribute("x1", parseInt(topLine.getAttribute("x1")) + gapX);
     topLine.setAttribute("y1", parseInt(topLine.getAttribute("y1")) + gapY);
-
   }
 
   if(targetEventNodeType=='group'){
@@ -577,8 +598,8 @@ var mmoveOnNode = function(e) {
   // 前のテンプレートからつながってるlineの終点を修正
   var preNormalNodes = getNormalNodesFromScenarioByNext(targetId);
   for(var i=0; i<preNormalNodes.length; i++){
-    preNormalNodes[i].gui.topLinePosition.to.x += gapX;
-    preNormalNodes[i].gui.topLinePosition.to.y += gapY;
+    //preNormalNodes[i].gui.topLinePosition.to.x += gapX;
+    //preNormalNodes[i].gui.topLinePosition.to.y += gapY;
     var bLineId = preNormalNodes[i].gui.topLineId;
     var bLine = document.querySelector(`#${bLineId}`);
     bLine.setAttribute("x2", parseInt(bLine.getAttribute("x2")) + gapX);
@@ -587,8 +608,8 @@ var mmoveOnNode = function(e) {
 
   var preSelectionNodes = getSelectionsFromScenarioByNext(targetId);
   for(var i=0; i<preSelectionNodes.length; i++){
-    preSelectionNodes[i].topLinePosition.to.x += gapX;
-    preSelectionNodes[i].topLinePosition.to.y += gapY;
+    //preSelectionNodes[i].topLinePosition.to.x += gapX;
+    //preSelectionNodes[i].topLinePosition.to.y += gapY;
     var bLineId = preSelectionNodes[i].topLineId;
     var bLine = document.querySelector(`#${bLineId}`);
     bLine.setAttribute("x2", parseInt(bLine.getAttribute("x2")) + gapX);
@@ -728,7 +749,7 @@ var upOnLineStart = function(e){
   topLine.classList.add('unsaved');
 
 
-  if(targetEventNodeType=='single'){
+  if(targetEventNodeType=='single' || targetEventNodeType=='point'){
     // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
     var preTopLine = document.querySelector(`#${targetEvent.gui.topLineId}`);
     if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
@@ -775,7 +796,7 @@ var upOnLineStart = function(e){
 
 
     // nextイベントをマウスオーバーしているテンプレートのイベントに紐付け
-    if(targetEventNodeType=='single'){
+    if(targetEventNodeType=='single' || targetEventNodeType=='point'){
 
       targetEvent.next = idOfOverTemplate;
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};

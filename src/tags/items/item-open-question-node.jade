@@ -1,9 +1,13 @@
 item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
   div.wrap-node
-    div.wrap-node-content.px8.pt8.pb6
-      p.question-text.mb8 {questionText}
-      div.wrap-selections
-        div.wrap-text.f.fm.flex-between.mb8
+    div.wrap-node-content
+      //p.question-text.mb8 {questionText}
+      div.wrap-question-text.px8.pt10
+        textarea(onkeyup='{updateQuestionText.bind(e, this)}').question-textarea {questionText}
+        p.hidden-text {questionText}
+      atom-open-question-answer(id='{id}' expected='{expectedAnswer}')
+      //div.wrap-answer
+        div.wrap-text.f.fm.flex-between.mt6.mb8
           p.expected-answer.pl8.pr8 {expectedAnswer}
           div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
             div(data-selectionid='{item.id}').drag-button
@@ -16,23 +20,20 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
     :scope {
       position: absolute;
       display: inline-block;
-      width: 180px;
+      width: 200px;
       cursor: grab;
 
       transition: transform 0.2s;
       transform: scale(1);
 
       .wrap-node {
-        border: solid #2196F3 0.5px;
-        /*box-shadow: 1px 1px 4px rgba(0,0,0,0.4);*/
-        overflow: hidden;
+        border: solid #999 0.5px;
         border-radius: 3px;
-        /*background: #2196F3;*/
         background: #fff;
         .wrap-node-content {
           overflow: visible;
+          /*
           .question-text {
-            /*color: #fff;*/
             color: #2196F3;
             text-align: center;
             font-weight: 300;
@@ -41,15 +42,44 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
             text-overflow: ellipsis;
             white-space: nowrap;
           }
-          .wrap-selections {
-            display: inline-block;
+          */
+          .wrap-question-text {
+            border-bottom: solid .6px rgba(0,0,0,0.2);
+            .hidden-text {
+              display: inline-block;
+              color: #2a2a2a;
+              letter-spacing: 0.6px;
+              font-size: 14px;
+              font-weight: 400;
+              max-width: 180px;
+
+              position: absolute;
+              left: 0px;
+              top: 0px;
+              word-break: break-all;
+              visibility: hidden;
+              pointer-events: none;
+            }
+            .question-textarea {
+              display: inline-block;
+              color: #2a2a2a;
+              letter-spacing: 0.6px;
+              font-size: 14px;
+              font-weight: 400;
+              max-width: 180px;
+
+              outline: none;
+              resize: none;
+              height: 34px;
+            }
+          }
+
+          .wrap-answer {
+            display: block;
             border-radius: 3px;
             width: 100%;
             .wrap-text {
-              /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
-              background: #fff;
-              border: solid #2196F3 0.5px;
-              border-radius: 3px;
+              position: relative;
               p {
                 width: 100%;
                 color: #999;
@@ -61,6 +91,24 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
                 white-space: nowrap;
               }
               .wrap-drag-button {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: calc(~'100% + 6px');
+                z-index: 10;
+                height: 100%;
+                cursor: pointer;
+                .drag-button {
+                  background: #2196F3;
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 50%;
+                }
+              }
+              /*
+              .wrap-drag-button {
+                position: absolute;
+                left: 100%;
                 cursor: pointer;
                 height: 34px;
                 .drag-button {
@@ -70,9 +118,10 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
                   border-radius: 50%;
                 }
               }
+              */
             }
           }
-        }
+        } /* .wrap-node-content */
       } /* .wrap-node */
 
       &.drag {
@@ -84,7 +133,7 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
 
       &.focused-node {
         .wrap-node {
-          border: solid #FF4081 2px !important;
+          border: solid #2196F3 0.8px !important;
           box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         }
       }
@@ -94,16 +143,16 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
         left: 4px;
         top: -20px;
         p {
-          font-size: 14px;
+          font-size: 12px;
           text-align: center;
-          color: #2196F3;
+          color: #999;
         }
       }
 
       .wrap-icon {
         position: absolute;
-        right: 0px;
-        top: -20px;
+        right: 2px;
+        top: -18px;
         cursor: pointer;
         display: none;
       }
@@ -134,8 +183,62 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
     ];
     */
 
-    this.down = mdownOnLineStart;
+    //this.down = mdownOnLineStart;
 
     this.click = clickOnNode;
     this.over = moverTemplate;
     this.out = moutTemplate;
+
+
+
+    this.updateQuestionText = function(self, e){
+
+      // エンターが押された時
+      if(e.keyCode==13){
+        var textarea = self.root.getElementsByClassName('question-textarea')[0];
+        var text = textarea.value;
+        text = text.replace(/\r?\n/g, '');
+        textarea.value = text;
+      }
+
+      var node = document.getElementById(self.id);
+
+      // nodeのテキストを変更
+      var node = self.root;//document.getElementById(self.content.id);
+
+      var preWidth = node.offsetWidth;
+      var preHeight = node.offsetHeight;
+
+      // hidden-textとtextareaを同期させて、動的にサイズが変化するtextareaを再現
+      var hiddenText = node.getElementsByClassName('hidden-text')[0];
+      hiddenText.innerHTML = e.target.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+
+      e.target.style.width = `${w+20}px`;
+      e.target.style.height = `${h}px`;
+
+
+
+      // 変更してずれる座標分の修正
+      var gapX = node.offsetWidth - preWidth;
+      var gapY = node.offsetHeight - preHeight;
+
+      // nodeの座標をtopLineが中心になるように修正
+      var content = getEventFromScenarioById(self.id);
+      var preNodePosY = content.gui.position.y;
+      content.gui.position.y = preNodePosY - gapY/2;
+      node.style.top = content.gui.position.y + 'px';
+
+      // textをシナリオデータに反映
+      content.text = e.target.value;
+
+      // 入力中はセーブさせない
+      clearTimeout(self.saveTimer);
+      self.saveTimer = setTimeout(function(){
+        saveScenarioAsSubcollection(self.content);
+      }, 800);
+
+
+    }

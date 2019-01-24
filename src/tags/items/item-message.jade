@@ -11,8 +11,9 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
   div.wrap-num
     p {num}
   div.wrap-icon.f.fh
-    atom-delete-node(id='{id}' if='{!(ifFirstNode)}')
-  div(if='{ifFirstNode}').start-node-overlay
+    atom-delete-node(id='{id}')
+    //atom-delete-node(id='{id}' if='{!(ifFirstNode)}')
+  //div(if='{ifFirstNode}').start-node-overlay
     p.py12 Start Node
 
 
@@ -224,11 +225,11 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
 
     });
 
+    /*
     // 始点ノードだった場合
     this.ifFirstNode = false;
     if(this.id.indexOf('first')==0) this.ifFirstNode = true;
-
-
+    */
 
     this.updateText = function(self, e){
 
