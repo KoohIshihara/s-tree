@@ -72,7 +72,8 @@ page-canvas
     }
 
     this.reloadPreview = function(){
-      initConversation(`first-${self.scenarioId}`);
+      var firstEventName = getEventFromScenarioById(`start-point-${riot.currentScenarioId}`).next;
+      initConversation(firstEventName);
     }
 
     this.urlToCopy = `${location.host}/#conversation/${this.scenarioId}`;

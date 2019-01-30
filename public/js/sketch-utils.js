@@ -1,24 +1,5 @@
 //---utils-------------------------------------------------------------------------------
 
-
-// scenarioのセーブ
-/*
-var saveScenario = function(){
-
-  var unsavedLine = document.querySelector('.unsaved');
-  if(unsavedLine) unsavedLine.classList.remove('unsaved');
-
-  //$('#wrapSaving').fadeIn(400);
-  service.db.collection('projects').doc(riot.currentProjectId)
-    .update(riot.currentProject)
-    .then(function(){
-      //$('#wrapSaving').fadeOut(400);
-      console.log('save array');
-    });
-
-}
-*/
-
 var scenarioHistories = [];
 
 // scenarioのセーブ
@@ -27,7 +8,7 @@ async function saveScenarioAsSubcollection(scenarioObj){
   var unsavedLine = document.querySelector('.unsaved');
   if(unsavedLine) unsavedLine.classList.remove('unsaved');
 
-  addHistory();
+  scenarioHistoriesAddHistory(scenarioHistories, scenarioArray);
 
   // nodeNumを更新
   service.db.collection('projects').doc(riot.currentProjectId)
@@ -64,7 +45,7 @@ async function saveScenarioAsSubcollection(scenarioObj){
   // クライアントの持つシナリオとデータベースのシナリオを比較して異なるものだけを更新する
   for(var i=0; i<scenarioOfDatabase.length; i++){
 
-    var eventOfClient = getEventFromScenarioById(scenarioOfDatabase[i].id);
+    var eventOfClient = scenarioGetContent(scenarioArray, scenarioOfDatabase[i].id);
     
     // clientにないノードはデータベース側からも削除する
     if(eventOfClient==undefined){
@@ -91,25 +72,6 @@ async function saveScenarioAsSubcollection(scenarioObj){
   console.log('saved');
 
 }
-
-
-
-
-
-// 履歴の管理
-var currentHistoryIndex = 0;
-var addHistory = function(){
-  //var history = scenarioArray.slice(0, scenarioArray.length);
-  //scenarioHistories.push(history);
-
-  if(scenarioHistories.length > 10) scenarioHistories.shift();
-
-  var history = JSON.stringify(scenarioArray);
-  scenarioHistories.push(JSON.parse(history));
-
-  currentHistoryIndex = 0;
-}
-
 
 
 

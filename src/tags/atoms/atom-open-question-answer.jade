@@ -3,7 +3,7 @@ atom-open-question-answer
     //p.expected-answer.pl8.pr8 {expectedAnswer}
     textarea(onkeyup='{updateText.bind(e, this)}').textarea.px8 {expectedAnswer}
     p.hidden-label.px8 {expectedAnswer}
-    div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+    //div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
       div(data-selectionid='{id}').drag-button
 
   style(scoped, type='less').
@@ -12,19 +12,6 @@ atom-open-question-answer
       width: 100%;
       .wrap-text {
         position: relative;
-        /*
-        p {
-          width: 100%;
-          color: #999;
-          letter-spacing: 0.6px;
-          font-size: 14px;
-          font-weight: 300;
-          text-align: center;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        */
 
         .textarea {
           font-size: 14px;
@@ -51,22 +38,6 @@ atom-open-question-answer
           word-break: break-all;
           pointer-events: none;
           visibility: hidden;
-        }
-
-        .wrap-drag-button {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: calc(~'100% + 6px');
-          z-index: 10;
-          height: 100%;
-          cursor: pointer;
-          .drag-button {
-            background: #2196F3;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-          }
         }
       }
     }

@@ -11,6 +11,8 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
           p.expected-answer.pl8.pr8 {expectedAnswer}
           div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
             div(data-selectionid='{item.id}').drag-button
+  div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+    div(data-selectionid='{id}').drag-button
   div.wrap-num
     p {num}
   div.wrap-icon.f.fh
@@ -124,6 +126,22 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
         } /* .wrap-node-content */
       } /* .wrap-node */
 
+      .wrap-drag-button {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: calc(~'100% + 6px');
+        z-index: 10;
+        height: 100%;
+        cursor: pointer;
+        .drag-button {
+          background: #2196F3;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+        }
+      }
+
       &.drag {
         cursor: grabbing !important;
       }
@@ -183,7 +201,7 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
     ];
     */
 
-    //this.down = mdownOnLineStart;
+    this.down = mdownOnLineStart;
 
     this.click = clickOnNode;
     this.over = moverTemplate;

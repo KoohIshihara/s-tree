@@ -66,21 +66,8 @@ item-pop-after-drag
 
       mixpanel.track('simple message node was added');
       
-
       // もし始点にすでにlineがあったらguiから削除する
-      if(targetEvent.gui.topLineId){
-        targetEvent.gui.topLineId
-      }
-
-      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-      var to = {x: arrowTo.x, y: arrowTo.y};
-
-      // この時のターゲットはsimpleMessageそのものではない。
-      if(targetEvent.nodeType=='single'){
-        targetEvent.gui.topLinePosition = {origin: from, to: to};
-      }else if(targetEvent.nodeType=='group'){
-        targetEvent.topLinePosition = {origin: from, to: to};
-      }
+      if(targetEvent.gui.topLineId) targetEvent.gui.topLineId;
 
       // contentを作成
       var content = {
@@ -96,12 +83,11 @@ item-pop-after-drag
       };
       riot.currentProject.nodeNum++;
 
-      addSimpleMessage(arrowTo.x, arrowTo.y, content, false);
-
+      addNode(arrowTo.x, arrowTo.y, content, 'item-message-node');
 
       // scenarioをupdateする
-      //saveScenario();
       saveScenarioAsSubcollection(content);
+
       focusNode(content);
 
       // ポップを消去
@@ -113,12 +99,6 @@ item-pop-after-drag
     this.addSelection = function(){
 
       mixpanel.track('selection node was added');
-
-      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-      var to = {x: arrowTo.x, y: arrowTo.y};
-
-      var event = getEventFromScenarioById(targetEvent.id);
-      event.gui.topLinePosition = {origin: from, to: to};
       
       var content = {
         author: session.user.uid,
@@ -137,14 +117,12 @@ item-pop-after-drag
       };
       riot.currentProject.nodeNum++;
 
-      addSelections(arrowTo.x, arrowTo.y, content, false);
+      addNode(arrowTo.x, arrowTo.y, content, 'item-selection-node');
 
       // ポップを消去
       var pop = document.querySelector('wrap-pop-after-drag');
       pop.classList.remove('show-pop');
 
-
-      //saveScenario();
       saveScenarioAsSubcollection(content);
       focusNode(content);
 
@@ -154,14 +132,7 @@ item-pop-after-drag
     this.addOpenQuestion = function(){
 
       mixpanel.track('open question node was added');
-
-      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-      var to = {x: arrowTo.x, y: arrowTo.y};
-
-      var event = getEventFromScenarioById(targetEvent.id);
-      event.gui.topLinePosition = {origin: from, to: to};
       
-
       var content = {
         author: session.user.uid,
         id: `openquestionTmp${riot.currentProject.nodeNum}`,
@@ -176,13 +147,12 @@ item-pop-after-drag
       };
       riot.currentProject.nodeNum++;
 
-      addOpenQuestion(arrowTo.x, arrowTo.y, content, false);
+      addNode(arrowTo.x, arrowTo.y, content, 'item-open-question-node');
 
       // ポップを消去
       var pop = document.querySelector('wrap-pop-after-drag');
       pop.classList.remove('show-pop');
 
-      //saveScenario();
       saveScenarioAsSubcollection(content);
       focusNode(content);
 
@@ -205,6 +175,7 @@ item-pop-after-drag
 
       // goToNodeを追加
       underChoiceOfGoTo = true;
+
     }
 
 

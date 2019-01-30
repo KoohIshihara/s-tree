@@ -19,12 +19,14 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
     var pos = event.gui.position;
   
     if(scenarioArray[i].nodeType == 'single'){
-      if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='gotoAnotherProject') addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='normal') loadNode(pos.x, pos.y, event, 'item-message-node'); //addSimpleMessage(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='openquestion') loadNode(pos.x, pos.y, event, 'item-open-question-node'); //addOpenQuestion(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='goto') loadNode(pos.x, pos.y, event, 'item-goto-node'); //addGoToNode(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='gotoAnotherProject') loadNode(pos.x, pos.y, event, 'item-goto-another-project-node'); //addGoToAnotherProjectNode(pos.x, pos.y, event, true);
     }
-    if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
+    if(scenarioArray[i].nodeType == 'group'){
+      loadNode(pos.x, pos.y, event, 'item-selection-node'); //addSelections(pos.x, pos.y, event, true);
+    }
     
     if(letScrollToFirst && firstEventId==scenarioArray[i].id){
       // はじめのメッセージのところまでスクロール
@@ -39,32 +41,6 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
 
 
   // lineを追加
-  /*
-  for(var i=0; i<scenarioArray.length; i++){
-    var nodeType = scenarioArray[i].nodeType;
-    if(nodeType == 'single'){
-      if(scenarioArray[i].gui.topLinePosition){
-        var pos = scenarioArray[i].gui.topLinePosition;
-        var from = {x: pos.origin.x, y: pos.origin.y};
-        var to = {x: pos.to.x, y: pos.to.y};
-        var topLineId = scenarioArray[i].gui.topLineId;
-        addLine(from, to, topLineId);
-      }
-    }else if(nodeType == 'group'){
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].topLinePosition){
-          var pos = selections[selection_i].topLinePosition;
-          var from = {x: pos.origin.x, y: pos.origin.y};
-          var to = {x: pos.to.x, y: pos.to.y};
-          var topLineId = selections[selection_i].topLineId;
-          addLine(from, to, topLineId);
-        }
-      }
-    }
-  } // for
-  */
-
   for(var i=0; i<scenarioArray.length; i++){
     var event = scenarioArray[i];
     var nodeType = scenarioArray[i].nodeType;
@@ -81,25 +57,19 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
         var nextId = event.next;
         var nextEvent = getEventFromScenarioById(nextId);
         var nextNode = document.getElementById(nextId);
-        var nextBoundingRect = nextNode.getBoundingClientRect();
-        var to = {
-          x: nextEvent.gui.position.x,
-          y: nextEvent.gui.position.y + nextBoundingRect.height/2,
-        };
 
-        var topLineId = event.gui.topLineId;
+        if(nextNode){
+          var nextBoundingRect = nextNode.getBoundingClientRect();
+          var to = {
+            x: nextEvent.gui.position.x,
+            y: nextEvent.gui.position.y + nextBoundingRect.height/2,
+          };
 
-        addLine(from, to, topLineId);
+          var topLineId = event.gui.topLineId;
+
+          addLine(from, to, topLineId);
+        }
       }
-      /*
-      if(scenarioArray[i].gui.topLinePosition){
-        var pos = scenarioArray[i].gui.topLinePosition;
-        var from = {x: pos.origin.x, y: pos.origin.y};
-        var to = {x: pos.to.x, y: pos.to.y};
-        var topLineId = scenarioArray[i].gui.topLineId;
-        addLine(from, to, topLineId);
-      }
-      */
     }else if(nodeType == 'group'){
       var event = getEventFromScenarioById(event.id);
       var groupNodePos = event.gui.position;
@@ -124,27 +94,20 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
           var nextId = selection.next;
           var nextEvent = getEventFromScenarioById(nextId);
           var nextNode = document.getElementById(nextId);
-          var nextBoundingRect = nextNode.getBoundingClientRect();
-          var to = {
-            x: nextEvent.gui.position.x,
-            y: nextEvent.gui.position.y + nextBoundingRect.height/2,
-          };
 
-          var topLineId = selection.topLineId;
+          if(nextNode){
+            var nextBoundingRect = nextNode.getBoundingClientRect();
+            var to = {
+              x: nextEvent.gui.position.x,
+              y: nextEvent.gui.position.y + nextBoundingRect.height/2,
+            };
 
-          addLine(from, to, topLineId);
+            var topLineId = selection.topLineId;
+
+            addLine(from, to, topLineId);
+          }
 
         }
-
-        /*
-        if(selections[selection_i].topLinePosition){
-          var pos = selections[selection_i].topLinePosition;
-          var from = {x: pos.origin.x, y: pos.origin.y};
-          var to = {x: pos.to.x, y: pos.to.y};
-          var topLineId = selections[selection_i].topLineId;
-          addLine(from, to, topLineId);
-        }
-        */
       }
     }else if(nodeType == 'point'){
       if(event.next){
@@ -179,313 +142,6 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
 
   canvasSvg.appendChild(topLine);
 
-}
-
-var addSimpleMessage = function(x, y, content, isLoading){
-  // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && (targetEvent.nodeType=='single' || targetEvent.nodeType=='point')){
-    targetEvent.next = content.id;
-  }
-
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
-    
-    var selections = targetEvent.selections;
-    for(var i=0; i<selections.length; i++){
-      if(selections[i].id==targetSelectionEventId){
-        selections[i].next = content.id;
-      }
-    }
-    targetEvent.selections = selections;
-  }
-
-
-  // 最初の要素を入れ込む
-  var itemWrapper = document.createElement('div');
-  itemWrapper.classList.add('wrap-item-message');
-  itemWrapper.dataset.id = content.id;
-  itemWrapper.id = content.id;
-
-  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
-  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
-
-  //canvas.appendChild(itemWrapper);
-  canvasNodes.appendChild(itemWrapper);
-
-  riot.mount(itemWrapper, 'item-message', {content: content});
-  riot.update();
-
-
-  // 初期位置に配置
-  var item = {};
-  item.width = itemWrapper.offsetWidth;
-  item.height = itemWrapper.offsetHeight;
-  item.x = x;// - item.width/2;
-  item.y = y - item.height/2;
-
-  var style = itemWrapper.style;
-  style.position = 'absolute';
-  
-
-  if(isLoading){
-    style.left = `${content.gui.position.x}px`;
-    style.top = `${content.gui.position.y}px`;
-  }else{
-    style.left = `${item.x}px`;
-    style.top = `${item.y}px`;
-    content.gui.position.x = item.x;
-    content.gui.position.y = item.y;
-  }
-
-  // イベントをシナリオに追加
-  if(!(isLoading)) scenarioArray.push(content);
-  
-}
-
-
-var addSelections = function(x, y, content, isLoading){
-
-  // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent) targetEvent.next = content.id;
-
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
-    
-    var selections = targetEvent.selections;
-    for(var i=0; i<selections.length; i++){
-      if(selections[i].id==targetSelectionEventId){
-        selections[i].next = content.id;
-      }
-    }
-    targetEvent.selections = selections;
-  }
-
-  // 最初の要素を入れ込む
-  var itemWrapper = document.createElement('div');
-  itemWrapper.classList.add('wrap-item-selection');
-  itemWrapper.dataset.id = content.id;
-  itemWrapper.id = content.id;
-
-  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
-  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
-
-  //canvas.appendChild(itemWrapper);
-  canvasNodes.appendChild(itemWrapper);
-
-  riot.mount(itemWrapper, 'item-selection', {content: content});
-  riot.update();
-
-  // 初期位置に配置
-  var item = {};
-  item.width = itemWrapper.offsetWidth;
-  item.height = itemWrapper.offsetHeight;
-  item.x = x;// - item.width/2;
-  item.y = y - item.height/2;
-
-  var style = itemWrapper.style;
-  style.position = 'absolute';
-
-  if(isLoading){
-    style.left = `${content.gui.position.x}px`;
-    style.top = `${content.gui.position.y}px`;
-  }else{
-    style.left = `${item.x}px`;
-    style.top = `${item.y}px`;
-    content.gui.position.x = item.x;
-    content.gui.position.y = item.y;
-  }
-
-  // イベントをシナリオに追加
-  if(!(isLoading)) scenarioArray.push(content);
-}
-
-
-var addOpenQuestion = function(x, y, content, isLoading){
-  // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && (targetEvent.nodeType=='single' || targetEvent.nodeType=='point')){
-    targetEvent.next = content.id;
-  }
-
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
-    
-    var selections = targetEvent.selections;
-    for(var i=0; i<selections.length; i++){
-      if(selections[i].id==targetSelectionEventId){
-        selections[i].next = content.id;
-      }
-    }
-    targetEvent.selections = selections;
-  }
-
-  /*if(!(isLoading) && content.type=='goto'){
-
-  }*/
-
-
-  // 最初の要素を入れ込む
-  var itemWrapper = document.createElement('div');
-  itemWrapper.classList.add('wrap-item-message');
-  itemWrapper.dataset.id = content.id;
-  itemWrapper.id = content.id;
-
-  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
-  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
-
-  //canvas.appendChild(itemWrapper);
-  canvasNodes.appendChild(itemWrapper);
-
-  riot.mount(itemWrapper, 'item-open-question-node', {content: content});
-  riot.update();
-
-
-  // 初期位置に配置
-  var item = {};
-  item.width = itemWrapper.offsetWidth;
-  item.height = itemWrapper.offsetHeight;
-  item.x = x;// - item.width/2;
-  item.y = y - item.height/2;
-
-  var style = itemWrapper.style;
-  style.position = 'absolute';
-  
-
-  if(isLoading){
-    style.left = `${content.gui.position.x}px`;
-    style.top = `${content.gui.position.y}px`;
-  }else{
-    style.left = `${item.x}px`;
-    style.top = `${item.y}px`;
-    content.gui.position.x = item.x;
-    content.gui.position.y = item.y;
-  }
-
-  // イベントをシナリオに追加
-  if(!(isLoading)) scenarioArray.push(content);
-  
-}
-
-
-
-var addGoToNode = function(x, y, content, isLoading){
-
-  // 最初の要素を入れ込む
-  var itemWrapper = document.createElement('div');
-  //itemWrapper.classList.add('wrap-item-message');
-  itemWrapper.dataset.id = content.id;
-  itemWrapper.id = content.id;
-
-  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
-  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
-
-  canvasNodes.appendChild(itemWrapper);
-
-  riot.mount(itemWrapper, 'item-goto-node', {content: content});
-  riot.update();
-
-
-  // 初期位置に配置
-  var item = {};
-  item.width = itemWrapper.offsetWidth;
-  item.height = itemWrapper.offsetHeight;
-  item.x = x;
-  item.y = y - item.height/2;
-
-  var style = itemWrapper.style;
-  style.position = 'absolute';
-  
-
-  if(isLoading){
-    style.left = `${content.gui.position.x}px`;
-    style.top = `${content.gui.position.y}px`;
-  }else{
-    style.left = `${item.x}px`;
-    style.top = `${item.y}px`;
-    content.gui.position.x = item.x;
-    content.gui.position.y = item.y;
-  }
-  
-  itemWrapper.classList.add('is-go-to-node');
-
-  if(!(isLoading)){
-    //var preNode = getNodeFromScenarioById(goToFromId);
-    //preNode.next = goToFromId;
-    scenarioArray.push(content);
-  }
-
-}
-
-
-
-var addGoToAnotherProjectNode = function(x, y, content, isLoading){
-
-  // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='single'){
-    targetEvent.next = content.id;
-  }
-
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
-    
-    var selections = targetEvent.selections;
-    for(var i=0; i<selections.length; i++){
-      if(selections[i].id==targetSelectionEventId){
-        selections[i].next = content.id;
-      }
-    }
-    targetEvent.selections = selections;
-  }
-
-  // 最初の要素を入れ込む
-  var itemWrapper = document.createElement('div');
-  //itemWrapper.classList.add('wrap-item-message');
-  itemWrapper.dataset.id = content.id;
-  itemWrapper.id = content.id;
-
-  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
-  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
-
-  canvasNodes.appendChild(itemWrapper);
-
-  riot.mount(itemWrapper, 'item-goto-another-project-node', {content: content});
-  riot.update();
-
-
-  // 初期位置に配置
-  var item = {};
-  item.width = itemWrapper.offsetWidth;
-  item.height = itemWrapper.offsetHeight;
-  item.x = x;
-  item.y = y - item.height/2;
-
-  var style = itemWrapper.style;
-  style.position = 'absolute';
-
-  if(isLoading){
-    style.left = `${content.gui.position.x}px`;
-    style.top = `${content.gui.position.y}px`;
-  }else{
-    style.left = `${item.x}px`;
-    style.top = `${item.y}px`;
-    content.gui.position.x = item.x;
-    content.gui.position.y = item.y;
-  }
-
-  // イベントをシナリオに追加
-  if(!(isLoading)) scenarioArray.push(content);
-
-}
-
-
-
-var addLine = function(arrowOrigin, arrowTo, id){
-  var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-  topLine.setAttribute('x1', arrowOrigin.x);
-  topLine.setAttribute('y1', arrowOrigin.y);
-  topLine.setAttribute('x2', arrowTo.x);
-  topLine.setAttribute('y2', arrowTo.y);
-  topLine.setAttribute('stroke', '#2196F3');
-  topLine.setAttribute('id', id);
-
-  canvasSvg.appendChild(topLine);
-
-  return topLine;
 }
 
 
@@ -842,10 +498,7 @@ var upOnLineStart = function(e){
 
 
 
-
 //--------------------------------------------------------------------------------------
-
-
 
 
 
@@ -881,7 +534,8 @@ var clickOnNode = function(e){
     var preNode = getNodeFromScenarioById(goToFromId);
     preNode.next = `goToTmp${riot.currentProject.nodeNum}`;
 
-    addGoToNode(arrowTo.x, arrowTo.y, goToContent, false);
+    //addGoToNode(arrowTo.x, arrowTo.y, goToContent, false);
+    addNode(arrowTo.x, arrowTo.y, goToContent, 'item-goto-node');
 
     riot.currentProject.nodeNum++;
 
@@ -909,45 +563,21 @@ var focusNode = function(focusedEvent){
 
   currentFocusedEvent = focusedEvent;
 
+  $('.focused-node').removeClass('focused-node');
+  var node = document.getElementById(focusedEvent.id);
+  if(node) node.classList.add('focused-node');
+
   // Go Toのプレヴュー用のラインを削除
   var lineForGoToPreview = document.getElementById('lineForGoToPreview');
   if(lineForGoToPreview) lineForGoToPreview.classList.remove('show');
 
   switch(focusedEvent.type){
-    case 'normal':
-
-      // インスペクタに表示
-      riot.mount('inspector', 'module-inspector-normal', {content: focusedEvent});
-      riot.update();
-
-    break;
-    case 'selection':
-
-      riot.mount('inspector', 'module-inspector-selection', {content: focusedEvent});
-      riot.update();
-
-    break;
-    case 'openquestion':
-
-      riot.mount('inspector', 'module-inspector-openquestion', {content: focusedEvent});
-      riot.update();
-
-    break;
     case 'goto':
-
       var toId = focusedEvent.toId;
       var toEvent = getEventFromScenarioById(toId);
 
-      if(toEvent.type=='normal'){
-        riot.mount('inspector', 'module-inspector-normal', {content: toEvent});
-        riot.update();
-      }else if(toEvent.type=='selection'){
-        riot.mount('inspector', 'module-inspector-selection', {content: toEvent});
-        riot.update();
-      }
-
       var toNode = document.getElementById(toEvent.id);
-      toNode.classList.add('focused-node');
+      if(toNode) toNode.classList.add('focused-node');
 
       // Go Toがどこにつながっているかをプレヴュー
       var fromNode = document.getElementById(focusedEvent.id);
@@ -967,21 +597,6 @@ var focusNode = function(focusedEvent){
       }
 
     break;
-    case 'gotoAnotherProject':
-
-      riot.mount('inspector', 'module-inspector-goto-project', {content: focusedEvent});
-      riot.update();
-
-    break
-  }
-
-  $('.focused-node').removeClass('focused-node');
-  var node = document.getElementById(focusedEvent.id);
-  if(node) node.classList.add('focused-node');
-
-  if(focusedEvent.type=='goto'){
-    var toNode = document.getElementById(toEvent.id);
-    if(toNode) toNode.classList.add('focused-node');
   }
 
 }
