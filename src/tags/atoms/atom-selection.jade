@@ -220,8 +220,7 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
 
           var y = groupEvent.gui.position.y + relativePos.top + boundingRect.height/2;
 
-          topLine.setAttribute('y1', y);
-          selections[i].topLinePosition.origin.y = y;
+          if(topLine) topLine.setAttribute('y1', y);
         }
 
         if(self.id==selections[i].id) self.selectionIndex = i;

@@ -34,7 +34,7 @@ atom-add-selection
       // ノードを追加
       var contentToAdd = {
         label: 'Selection',
-        id: `selectionTmp${this.content.num}-selection${this.content.addedSelectionsCounter}`,
+        id: `selectionTmp${self.content.num}-selection${self.content.addedSelectionsCounter}`,
       };
       self.content.addedSelectionsCounter++;
       self.content.selections.push(contentToAdd);
@@ -70,8 +70,7 @@ atom-add-selection
 
           var y = absoluteTop + 16 + canvas.scrollTop - 48;
 
-          topLine.setAttribute('y1', y);
-          selections[i].topLinePosition.origin.y = y;
+          if(topLine) topLine.setAttribute('y1', y);
         }
 
         if(self.id==selections[i].id) self.selectionIndex = i;
