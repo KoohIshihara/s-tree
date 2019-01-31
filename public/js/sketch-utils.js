@@ -64,7 +64,8 @@ async function saveScenarioAsSubcollection(scenarioObj){
   // クライアントの持つシナリオとデータベースのシナリオを比較して異なるものだけを更新する
   for(var i=0; i<scenarioOfDatabase.length; i++){
 
-    var eventOfClient = getEventFromScenarioById(scenarioOfDatabase[i].id);
+    // var eventOfClient = getEventFromScenarioById(scenarioOfDatabase[i].id);
+    var eventOfClient = scenarioGetEventById(scenarioArray, scenarioOfDatabase[i].id);
 
     // clientにないノードはデータベース側からも削除する
     if(eventOfClient==undefined){
@@ -138,16 +139,16 @@ var moutTemplate = function(e){
 
 
 // あるidを持つイベントをシナリオから取り出す
-var getEventFromScenarioById = function(id){
-  var event;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].id == id){
-      event = scenarioArray[i];
-      break;
-    }
-  }
-  return event;
-}
+// var getEventFromScenarioById = function(id){
+//   var event;
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].id == id){
+//       event = scenarioArray[i];
+//       break;
+//     }
+//   }
+//   return event;
+// }
 
 var getEventFromScenarioByNext = function(next){
   var event;

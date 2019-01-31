@@ -32,6 +32,21 @@ atom-delete-node
       //this.event = getEventFromScenarioById(this.id);
 
       // singleとgroupそれぞれに対して、nextを持つ全てのnodeのデータを消去して、GUIから要素を消去
+      //- var preIndexesOfNomalNodes = getIndexesOfNormalNodesFromScenarioByNext(id);
+      //- for(var i=0; i<preIndexesOfNomalNodes.length; i++){
+      //-   var index = preIndexesOfNomalNodes[i];
+
+      //-   //- var lineName = `line-${scenarioArray[index.scenarioIndex].id}`;
+      //-   var lineName = `line-${scenarioGetId(scenarioArray, index.scenarioIndex)}`;
+      //-   var line = document.getElementById(lineName);
+      //-   if(line) line.parentNode.removeChild(line);
+
+      //-   delete scenarioArray[index.scenarioIndex].next;
+      //-   delete scenarioArray[index.scenarioIndex].gui.topLineId;
+      //-   delete scenarioArray[index.scenarioIndex].gui.topLinePosition;
+      //- }
+
+      scenarioDisconnectNormalNode(scenarioArray, id);
       var preIndexesOfNomalNodes = getIndexesOfNormalNodesFromScenarioByNext(id);
       for(var i=0; i<preIndexesOfNomalNodes.length; i++){
         var index = preIndexesOfNomalNodes[i];
@@ -40,28 +55,35 @@ atom-delete-node
         var lineName = `line-${scenarioGetId(scenarioArray, index.scenarioIndex)}`;
         var line = document.getElementById(lineName);
         if(line) line.parentNode.removeChild(line);
-
-        delete scenarioArray[index.scenarioIndex].next;
-        delete scenarioArray[index.scenarioIndex].gui.topLineId;
-        delete scenarioArray[index.scenarioIndex].gui.topLinePosition;
       }
 
+      //- var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(id);
+      //- for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
+      //-   var index = preIndexesOfSelectionNodes[i];
+      //- 
+      //-   var lineName = `line-${scenarioArray[index.scenarioIndex].selections[index.selectionIndex].id}`;
+      //-   var line = document.getElementById(lineName);
+      //-   if(line) line.parentNode.removeChild(line);
+      //- 
+      //-   delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].next;
+      //-   delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLineId;
+      //-   delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLinePosition;
+      //- }
+
+      scenarioDisconnectSelectionsNode(scenarioArray, id);
       var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(id);
       for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
         var index = preIndexesOfSelectionNodes[i];
-
+      
         var lineName = `line-${scenarioArray[index.scenarioIndex].selections[index.selectionIndex].id}`;
         var line = document.getElementById(lineName);
         if(line) line.parentNode.removeChild(line);
-
-        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].next;
-        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLineId;
-        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLinePosition;
       }
 
 
       // 自身のイベントデータと要素を消去
-      var selfNode = getEventFromScenarioById(id);
+      //- var selfNode = getEventFromScenarioById(id);
+      var selfNode = scenarioGetEventById(scenarioArray, id);
       
       if(selfNode.nodeType=='single'){
 
@@ -106,6 +128,3 @@ atom-delete-node
       //saveScenarioAsSubcollection();
       //saveScenario();
     } // deleteNode
-
-
-

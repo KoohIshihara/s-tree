@@ -69,4 +69,59 @@ describe("scenario", () => {
     sc.scenarioDeleteNode(myScenario, 4);
     expect(sc.scenarioGetSize(myScenario)).toBe(myScenario.length);
   });
+
+  it("doesn't disconnect the normal node when passed (next) id is not found", () => {
+    myScenario.push({ nodeType: 'single', next: 1 });
+    myScenario.push({ nodeType: 'single', next: 2 });
+    myScenario.push({ nodeType: 'single', next: 3 });
+    sc.scenarioDisconnectNormalNode(myScenario, 4);
+    for (var i = 0; i < myScenario.length; i++) {
+      expect(typeof myScenario[i].next).not.toBe('undefined');
+    }
+  });
+
+  it("disconnects the normal node when it's next is equal to passed id", () => {
+    myScenario.push({ nodeType: 'single', next: 1, gui: { topLineId: 1, topLinePosition: 1 }});
+    myScenario.push({ nodeType: 'single', next: 2, gui: { topLineId: 2, topLinePosition: 2 }});
+    myScenario.push({ nodeType: 'single', next: 3, gui: { topLineId: 3, topLinePosition: 3 }});
+    sc.scenarioDisconnectNormalNode(myScenario, 2);
+    expect(typeof myScenario[1].next).toBe('undefined');
+    expect(typeof myScenario[1].gui.topLineId).toBe('undefined');
+    expect(typeof myScenario[1].gui.topLinePosition).toBe('undefined');
+  });
+
+  it("doesn't disconnect the selections node when passed (next) id is not found", () => {
+    myScenario.push({ nodeType: 'group', selections: [{ next: 1, gui: { topLineId: 1, topLinePosition: 1 }}]});
+    myScenario.push({ nodeType: 'group', selections: [{ next: 2, gui: { topLineId: 2, topLinePosition: 2 }}]});
+    myScenario.push({ nodeType: 'group', selections: [{ next: 3, gui: { topLineId: 3, topLinePosition: 3 }}]});
+    sc.scenarioDisconnectSelectionsNode(myScenario, 4);
+    for (var i = 0; i < myScenario.length; i++) {
+      expect(typeof myScenario[i].selections[0].next).not.toBe('undefined');
+    }
+  });
+
+  it("disconnect the selections node when selections' next is equal to passed id", () => {
+    myScenario.push({ nodeType: 'group', selections: [{ next: 1, topLineId: 1, topLinePosition: 1 }]});
+    myScenario.push({ nodeType: 'group', selections: [{ next: 2, topLineId: 2, topLinePosition: 2 }]});
+    myScenario.push({ nodeType: 'group', selections: [{ next: 3, topLineId: 3, topLinePosition: 3 }]});
+    sc.scenarioDisconnectSelectionsNode(myScenario, 2);
+    expect(typeof myScenario[1].selections[0].next).toBe('undefined');
+    expect(typeof myScenario[1].selections[0].topLineId).toBe('undefined');
+    expect(typeof myScenario[1].selections[0].topLinePosition).toBe('undefined');
+  });
+
+  it("returns an event when passed id is found", () => {
+    myScenario.push({ id: 1, text: "hello" });
+    myScenario.push({ id: 2, text: "hello hello" });
+    myScenario.push({ id: 3, text: "hello hello hello" });
+    expect(sc.scenarioGetEventById(myScenario, 2).text).toBe("hello hello");
+  });
+
+  it("returns null when passed id is not found", () => {
+    myScenario.push({ id: 1, text: "hello" });
+    myScenario.push({ id: 2, text: "hello hello" });
+    myScenario.push({ id: 3, text: "hello hello hello" });
+    expect(sc.scenarioGetEventById(myScenario, 0)).toBe(null);
+  });
+
 });

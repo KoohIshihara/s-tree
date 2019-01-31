@@ -117,7 +117,8 @@ item-pop-after-drag
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
       var to = {x: arrowTo.x, y: arrowTo.y};
 
-      var event = getEventFromScenarioById(targetEvent.id);
+      //- var event = getEventFromScenarioById(targetEvent.id);
+      var event = scenarioGetEventById(scenarioArray, targetEvent.id);
       event.gui.topLinePosition = {origin: from, to: to};
       
       var content = {
@@ -159,7 +160,8 @@ item-pop-after-drag
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
       var to = {x: arrowTo.x, y: arrowTo.y};
 
-      var event = getEventFromScenarioById(targetEvent.id);
+      //- var event = getEventFromScenarioById(targetEvent.id);
+      var event = scenarioGetEventByID(scenarioArray, targetEvent.id);
       event.gui.topLinePosition = {origin: from, to: to};
       
 

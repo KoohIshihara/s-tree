@@ -1,4 +1,3 @@
-
 var canvas, canvasNodes, canvasSvg;
 
 var loadCanvas = function(firstEventId, letScrollToFirst){
@@ -567,7 +566,8 @@ var mdownOnLineStart = function(e){
   // 操作しているテンプレートに紐づくイベントを取得
   targetId = $(e.target).parents('.node')[0].dataset.id;
   
-  targetEvent = getEventFromScenarioById(targetId);
+  // targetEvent = getEventFromScenarioById(targetId);
+  targetEvent = scenarioGetEventById(scenarioArray, targetId);
   targetEventNodeType = targetEvent.nodeType;
 
   if(targetEventNodeType=='group'){
@@ -748,7 +748,8 @@ var goToFrom, goToFromId; // goToNodeを作ろうとした時の派生元のノ�
 var clickOnNode = function(e){
 
   targetId = $(e.target).parents('.node')[0].dataset.id;
-  targetEvent = getEventFromScenarioById(targetId);
+  // targetEvent = getEventFromScenarioById(targetId);
+  targetEvent = scenarioGetEventById(scenarioArray, targetId);
   
   // ノードにフォーカスする
   focusNode(targetEvent);
@@ -829,7 +830,8 @@ var focusNode = function(focusedEvent){
     case 'goto':
 
       var toId = focusedEvent.toId;
-      var toEvent = getEventFromScenarioById(toId);
+      // var toEvent = getEventFromScenarioById(toId);
+      var toEvent = scenarioGetEventById(scenarioArray, toId);
 
       if(toEvent.type=='normal'){
         riot.mount('inspector', 'module-inspector-normal', {content: toEvent});

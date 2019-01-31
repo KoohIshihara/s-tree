@@ -226,6 +226,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
 
       // nodeの座標をtopLineが中心になるように修正
       var content = getEventFromScenarioById(self.id);
+      var content = scenarioGetEventById(scenarioArray, self.id);
       var preNodePosY = content.gui.position.y;
       content.gui.position.y = preNodePosY - gapY/2;
       node.style.top = content.gui.position.y + 'px';

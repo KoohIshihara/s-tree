@@ -1,4 +1,3 @@
-
 var exportCsv = function(){
   // 配列 の用意
   var array_data = convertScenarioArrayToCsv(); //[['りんご',1,200],['メロン',2,4000],['バナナ',4,500]];
@@ -68,7 +67,8 @@ var convertScenarioArrayToCsv = function(){
   // automation作成開始
   // はじめのautomationからselectionを表示するまでを先に入れる
   var firstEventId = `first-${riot.currentProjectId}`;
-  var firstEvent = getEventFromScenarioById(firstEventId);
+  // var firstEvent = getEventFromScenarioById(firstEventId);
+  var firstEvent = scenarioGetEventById(scenarioArray, firstEventId);
   var firstAutomationActionNum = 1;
   resultToExportArray.push([`auto-${firstEventId}`,'automation','event','Dialog.open','name',`Automation ${firstEventId}`,'','']);
   resultToExportArray.push([`auto-${firstEventId}.case1`,'automation_case','','','','','','']);
@@ -86,7 +86,8 @@ var convertScenarioArrayToCsv = function(){
     if(!nextId) break;
 
     // nextがあってかつnormalな場合、次のeventをactionをautomationに足す
-    var nextEvent = getEventFromScenarioById(nextId);
+    // var nextEvent = getEventFromScenarioById(nextId);
+    var nextEvent = scenarioGetEventById(scenarioArray, nextId);
     resultToExportArray.push([`auto-${firstEventId}.case1.action${firstAutomationActionNum}`,'automation_action','type','send_message','template', nextEvent.id,'op','then']);
     firstAutomationActionNum++;
 
@@ -123,7 +124,8 @@ var convertScenarioArrayToCsv = function(){
           var nextId = currentNode.next;
           if(!nextId) break;
 
-          var nextNode = getEventFromScenarioById(nextId);
+          // var nextNode = getEventFromScenarioById(nextId);
+          var nextNode = scenarioGetEventById(scenarioArray, nextId);
 
           // 次のノードがselectionだったら抜ける
           if(nextNode){
@@ -134,7 +136,8 @@ var convertScenarioArrayToCsv = function(){
             if(nextNode.type=='goto'){
               
               // gotoのexportやっているところ
-              nextNode = getEventFromScenarioById(nextNode.toId);
+              // nextNode = getEventFromScenarioById(nextNode.toId);
+              nextNode = scenarioGetEventById(scenarioArray, nextNode.toId);
             }
 
             // ノードがnormalで、かつnextもある場合、actionを足す
