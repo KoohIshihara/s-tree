@@ -150,113 +150,107 @@ var moutTemplate = function(e){
 //   return event;
 // }
 
-var getEventFromScenarioByNext = function(next){
-  var event;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].next == next){
-      event = scenarioArray[i];
-      break;
-    }
-  }
-  return event;
-}
+// var getEventFromScenarioByNext = function(next){
+//   var event;
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].next == next){
+//       event = scenarioArray[i];
+//       break;
+//     }
+//   }
+//   return event;
+// }
 
-var getNodeFromScenarioById = function(id){
-  var node;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType == 'single'){
+// var getNodeFromScenarioById = function(id){
+//   var node;
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].nodeType == 'single'){
 
-      if(scenarioArray[i].id == id) node = scenarioArray[i];
+//       if(scenarioArray[i].id == id) node = scenarioArray[i];
 
-    }else if(scenarioArray[i].nodeType == 'group'){
+//     }else if(scenarioArray[i].nodeType == 'group'){
 
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].id == id) node = selections[selection_i];
-      }
+//       var selections = scenarioArray[i].selections;
+//       for(var selection_i=0; selection_i<selections.length; selection_i++){
+//         if(selections[selection_i].id == id) node = selections[selection_i];
+//       }
 
-    }
-  } // for
-  return node;
-}
+//     }
+//   } // for
+//   return node;
+// }
 
 // nextからnodeを取得
-var getNormalNodesFromScenarioByNext = function(next){
+// var getNormalNodesFromScenarioByNext = function(next){
 
-  var resultNodes = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
-      resultNodes.push(scenarioArray[i]);
-    }
-  }
-  return resultNodes;
+//   var resultNodes = [];
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
+//       resultNodes.push(scenarioArray[i]);
+//     }
+//   }
+//   return resultNodes;
 
-}
+// }
 
-var getSelectionsFromScenarioByNext = function(next){
+// var getSelectionsFromScenarioByNext = function(next){
 
-  var resultSelection = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='group'){
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].next==next){
-          resultSelection.push(selections[selection_i]);
-        }
-      }
-    }
-  }
+//   var resultSelection = [];
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].nodeType=='group'){
+//       var selections = scenarioArray[i].selections;
+//       for(var selection_i=0; selection_i<selections.length; selection_i++){
+//         if(selections[selection_i].next==next){
+//           resultSelection.push(selections[selection_i]);
+//         }
+//       }
+//     }
+//   }
 
-  return resultSelection;
-}
-
-
+//   return resultSelection;
+// }
 
 // nextからscenarioArrayのindexを取得
-var getIndexesOfNormalNodesFromScenarioByNext = function(next){
+// var getIndexesOfNormalNodesFromScenarioByNext = function(next){
 
-  var resultIndexs = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
-      resultIndexs.push({scenarioIndex: i});
-    }
-  }
-  return resultIndexs;
+//   var resultIndexs = [];
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
+//       resultIndexs.push({scenarioIndex: i});
+//     }
+//   }
+//   return resultIndexs;
 
-}
+// }
 
-var getIndexesOfSelectionsFromScenarioByNext = function(next){
+// var getIndexesOfSelectionsFromScenarioByNext = function(next){
 
-  var resultIndexs = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='group'){
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].next==next){
-          resultIndexs.push({scenarioIndex: i, selectionIndex: selection_i});
-        }
-      }
-    }
-  }
+//   var resultIndexs = [];
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].nodeType=='group'){
+//       var selections = scenarioArray[i].selections;
+//       for(var selection_i=0; selection_i<selections.length; selection_i++){
+//         if(selections[selection_i].next==next){
+//           resultIndexs.push({scenarioIndex: i, selectionIndex: selection_i});
+//         }
+//       }
+//     }
+//   }
 
-  return resultIndexs;
-}
-
-
-
-
+//   return resultIndexs;
+// }
 
 // gotoのeventをtoIdから取得
-var getEventOfGoToByToId = function(toId){
+// var getEventOfGoToByToId = function(toId){
 
-  var events = [];
+//   var events = [];
 
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].type=='goto'){
-      if(scenarioArray[i].toId==toId) events.push(scenarioArray[i]);
-    }
-  }
+//   for(var i=0; i<scenarioArray.length; i++){
+//     if(scenarioArray[i].type=='goto'){
+//       if(scenarioArray[i].toId==toId) events.push(scenarioArray[i]);
+//     }
+//   }
 
-  return events;
+//   return events;
 
-}
+// }

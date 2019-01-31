@@ -47,7 +47,8 @@ atom-delete-node
       //- }
 
       scenarioDisconnectNormalNode(scenarioArray, id);
-      var preIndexesOfNomalNodes = getIndexesOfNormalNodesFromScenarioByNext(id);
+      //- var preIndexesOfNomalNodes = getIndexesOfNormalNodesFromScenarioByNext(id);
+      var preIndexesOfNomalNodes = scenarioGetNormalNodeIndexesThatConnectTo(scenarioArray, id);
       for(var i=0; i<preIndexesOfNomalNodes.length; i++){
         var index = preIndexesOfNomalNodes[i];
 
@@ -71,7 +72,8 @@ atom-delete-node
       //- }
 
       scenarioDisconnectSelectionsNode(scenarioArray, id);
-      var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(id);
+      //- var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(id);
+      var preIndexesOfSelectionNodes = scenarioGetSelectionIndexesThatConnectTo(scenarioArray, id);
       for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
         var index = preIndexesOfSelectionNodes[i];
       
@@ -114,7 +116,8 @@ atom-delete-node
       scenarioDeleteNode(scenarioArray, selfNode.id);
 
       // gotoのイベントのtoIdに指定されていた場合はリンクしているgotoも削除
-      var gotoEvents = getEventOfGoToByToId(id);
+      //- var gotoEvents = getEventOfGoToByToId(id);
+      var gotoEvents = scenarioGetGoToEventsThatJumpTo(scenarioArray, id);
       for(var i=0; i<gotoEvents.length; i++){
         this.deleteNode(gotoEvents[i].id);
       }

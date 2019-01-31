@@ -488,7 +488,8 @@ var mmoveOnNode = function(e) {
   }
 
   // 前のテンプレートからつながってるlineの終点を修正
-  var preNormalNodes = getNormalNodesFromScenarioByNext(targetId);
+  // var preNormalNodes = getNormalNodesFromScenarioByNext(targetId);
+  var preNormalNodes = scenarioGetNodesThatConnectTo(scenarioArray, targetId);
   for(var i=0; i<preNormalNodes.length; i++){
     preNormalNodes[i].gui.topLinePosition.to.x += gapX;
     preNormalNodes[i].gui.topLinePosition.to.y += gapY;
@@ -591,7 +592,8 @@ var mdownOnLineStart = function(e){
     pop.classList.remove('show-pop');
 
     var nodeId = unsavedLine.id.split('-')[1];
-    var node = getNodeFromScenarioById(nodeId);
+    // var node = getNodeFromScenarioById(nodeId);
+    var node = scenarioGetNodeById(scenarioArray, nodeId);
     delete node.topLineId;
     delete node.topLinePosition;
   }
@@ -772,7 +774,8 @@ var clickOnNode = function(e){
       },
     };
 
-    var preNode = getNodeFromScenarioById(goToFromId);
+    // var preNode = getNodeFromScenarioById(goToFromId);
+    var preNode = scenarioGetNodeById(scenarioArray, goToFromId);
     preNode.next = `goToTmp${riot.currentProject.nodeNum}`;
 
     addGoToNode(arrowTo.x, arrowTo.y, goToContent, false);

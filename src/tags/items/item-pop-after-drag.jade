@@ -161,7 +161,7 @@ item-pop-after-drag
       var to = {x: arrowTo.x, y: arrowTo.y};
 
       //- var event = getEventFromScenarioById(targetEvent.id);
-      var event = scenarioGetEventByID(scenarioArray, targetEvent.id);
+      var event = scenarioGetEventById(scenarioArray, targetEvent.id);
       event.gui.topLinePosition = {origin: from, to: to};
       
 

@@ -124,4 +124,98 @@ describe("scenario", () => {
     expect(sc.scenarioGetEventById(myScenario, 0)).toBe(null);
   });
 
+  it("returns a single node when passed id is found in single node", () => {
+    myScenario.push({ nodeType: "single", id: 1, text: "hello" });
+    myScenario.push({ nodeType: "single", id: 2, text: "hello hello" });
+    myScenario.push({ nodeType: "single", id: 3, text: "hello hello hello" });
+    myScenario.push({ nodeType: "group", selections: [{ id: 4, text: "hi" }, { id: 5, text: "hi hi" }]});
+    expect(sc.scenarioGetNodeById(myScenario, 2).text).toBe("hello hello");
+  });
+  
+  it("returns a selection node when passed id is found in group selection", () => {
+    myScenario.push({ nodeType: "single", id: 1, text: "hello" });
+    myScenario.push({ nodeType: "single", id: 2, text: "hello hello" });
+    myScenario.push({ nodeType: "single", id: 3, text: "hello hello hello" });
+    myScenario.push({ nodeType: "group", selections: [{ id: 4, text: "hi" }, { id: 5, text: "hi hi" }]});
+    expect(sc.scenarioGetNodeById(myScenario, 5).text).toBe("hi hi");
+  });
+  
+  it("returns null when passed id is not found", () => {
+    myScenario.push({ nodeType: "single", id: 1, text: "hello" });
+    myScenario.push({ nodeType: "single", id: 2, text: "hello hello" });
+    myScenario.push({ nodeType: "single", id: 3, text: "hello hello hello" });
+    myScenario.push({ nodeType: "group", selections: [{ id: 4, text: "hi" }, { id: 5, text: "hi hi" }]});
+    expect(sc.scenarioGetNodeById(myScenario, 0)).toBe(null);
+  });
+
+  it("returns a list of single nodes that connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "single", next: 2 });
+    myScenario.push({ nodeType: "group", next: 2 });
+    expect(sc.scenarioGetNodesThatConnectTo(myScenario, 2).length).toBe(1);
+  });
+
+  it("returns an empty list when no single nodes connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "single", next: 2 });
+    myScenario.push({ nodeType: "group", next: 3 });
+    expect(sc.scenarioGetNodesThatConnectTo(myScenario, 3).length).toBe(0);
+  });
+
+  it("returns a list of selections that connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "group", selections: [{ next: 2, text: "hi" }, { next: 3, text: "hi hi" }]});
+    myScenario.push({ nodeType: "group", selections: [{ next: 4, text: "hi" }, { next: 2, text: "hi hi" }]});
+    expect(sc.scenarioGetSelectionsThatConnectTo(myScenario, 2).length).toBe(2);
+  });
+
+  it("returns an empty list when no selections connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "group", selections: [{ next: 2, text: "hi" }, { next: 3, text: "hi hi" }]});
+    myScenario.push({ nodeType: "group", selections: [{ next: 4, text: "hi" }, { next: 2, text: "hi hi" }]});
+    expect(sc.scenarioGetSelectionsThatConnectTo(myScenario, 1).length).toBe(0);
+  });
+
+  it("returns a list of single node indexes that connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "single", next: 2 });
+    myScenario.push({ nodeType: "group", next: 2 });
+    expect(sc.scenarioGetNormalNodeIndexesThatConnectTo(myScenario, 2)).toEqual([{ scenarioIndex: 1 }]);
+  });
+
+  it("returns an empty list when no single nodes connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "single", next: 2 });
+    myScenario.push({ nodeType: "group", next: 3 });
+    expect(sc.scenarioGetNormalNodeIndexesThatConnectTo(myScenario, 3).length).toBe(0);
+  });
+
+  it("returns a list of selection indexes that connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "group", selections: [{ next: 2, text: "hi" }, { next: 3, text: "hi hi" }]});
+    myScenario.push({ nodeType: "group", selections: [{ next: 4, text: "hi" }, { next: 5, text: "hi hi" }]});
+    expect(sc.scenarioGetSelectionIndexesThatConnectTo(myScenario, 2)).toEqual([{ scenarioIndex: 1, selectionIndex: 0}]);
+  });
+
+  it("returns an empty list when no selections connect to id", () => {
+    myScenario.push({ nodeType: "single", next: 1 });
+    myScenario.push({ nodeType: "group", selections: [{ next: 2, text: "hi" }, { next: 3, text: "hi hi" }]});
+    myScenario.push({ nodeType: "group", selections: [{ next: 4, text: "hi" }, { next: 2, text: "hi hi" }]});
+    expect(sc.scenarioGetSelectionIndexesThatConnectTo(myScenario, 1).length).toBe(0);
+  });
+
+  it("returns a list of goto events that jump to id", () => {
+    myScenario.push({ type: "goto", toId: 1 });
+    myScenario.push({ type: "goto", toId: 2 });
+    myScenario.push({ type: "openquestion", toId: 3 });
+    expect(sc.scenarioGetGoToEventsThatJumpTo(myScenario, 2).length).toBe(1);
+  });
+
+  it("returns an empty list when no goto events jump to id", () => {
+    myScenario.push({ type: "goto", toId: 1 });
+    myScenario.push({ type: "goto", toId: 2 });
+    myScenario.push({ type: "openquestion", toId: 3 });
+    expect(sc.scenarioGetGoToEventsThatJumpTo(myScenario, 3).length).toBe(0);
+  });
+
 });
