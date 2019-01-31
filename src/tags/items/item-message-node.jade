@@ -6,8 +6,8 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
       p.text.hidden-text.px12 {text}
       //div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
         div.drag-button
-  div(onmousedown='{down}').wrap-drag-button.f.fm
-    div.drag-button
+  div.wrap-drag-button.f.fm
+    div(onmousedown='{down}').drag-button
   div.wrap-num
     p {num}
   div.wrap-icon.f.fh
@@ -72,13 +72,13 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
 
       .wrap-drag-button {
         position: absolute;
-        cursor: pointer;
         top: 0;
         left: calc(~'100% + 6px');
         z-index: 10;
         height: 100%;
         cursor: pointer;
         .drag-button {
+          cursor: pointer;
           background: #2196F3;
           width: 8px;
           height: 8px;

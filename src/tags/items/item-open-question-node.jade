@@ -6,11 +6,6 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
         textarea(onkeyup='{updateQuestionText.bind(e, this)}').question-textarea {questionText}
         p.hidden-text {questionText}
       atom-open-question-answer(id='{id}' expected='{expectedAnswer}')
-      //div.wrap-answer
-        div.wrap-text.f.fm.flex-between.mt6.mb8
-          p.expected-answer.pl8.pr8 {expectedAnswer}
-          div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
-            div(data-selectionid='{item.id}').drag-button
   div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
     div(data-selectionid='{id}').drag-button
   div.wrap-num
@@ -107,20 +102,6 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
                   border-radius: 50%;
                 }
               }
-              /*
-              .wrap-drag-button {
-                position: absolute;
-                left: 100%;
-                cursor: pointer;
-                height: 34px;
-                .drag-button {
-                  background: #2196F3;
-                  width: 16px;
-                  height: 16px;
-                  border-radius: 50%;
-                }
-              }
-              */
             }
           }
         } /* .wrap-node-content */
@@ -133,12 +114,12 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
         left: calc(~'100% + 6px');
         z-index: 10;
         height: 100%;
-        cursor: pointer;
         .drag-button {
           background: #2196F3;
           width: 8px;
           height: 8px;
           border-radius: 50%;
+          cursor: pointer;
         }
       }
 

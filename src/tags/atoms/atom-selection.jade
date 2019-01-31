@@ -2,8 +2,8 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
   //p.pl12.pr8 {label}
   textarea(onkeyup='{updateSelectionText.bind(e, this)}').selection-textarea.px8 {label}
   p.hidden-label.px8 {label}
-  div(onmousedown='{down}').wrap-drag-button.f.fm
-    div(data-selectionid='{id}').drag-button
+  div.wrap-drag-button.f.fm
+    div(onmousedown='{down}' data-selectionid='{id}').drag-button
 
   style(scoped, type='less').
     :scope {
@@ -46,8 +46,8 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
         left: calc(~'100% + 6px');
         z-index: 10;
         height: 100%;
-        cursor: pointer;
         .drag-button {
+          cursor: pointer;
           background: #2196F3;
           width: 8px;
           height: 8px;
