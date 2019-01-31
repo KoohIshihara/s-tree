@@ -218,17 +218,16 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
 
 
       // nodeのテキストを変更
-      var node = self.root;//document.getElementById(self.content.id);
-      var nodeText = node.getElementsByClassName('text')[0];
+      var node = self.root;
 
       var preWidth = node.offsetWidth;
       var preHeight = node.offsetHeight;
-      //nodeText.innerText = value;
-
 
 
       // hidden-textとtextareaを同期させて、動的にサイズが変化するtextareaを再現
       var hiddenText = node.getElementsByClassName('hidden-text')[0];
+
+
       hiddenText.innerHTML = e.target.value;
 
       var w = hiddenText.offsetWidth;
@@ -238,7 +237,6 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
       e.target.style.height = `${h}px`;
 
 
-
       // 変更してずれる座標分の修正
       var gapX = node.offsetWidth - preWidth;
       var gapY = node.offsetHeight - preHeight;
@@ -246,8 +244,10 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
       // nodeの座標をtopLineが中心になるように修正
       var content = getEventFromScenarioById(self.id);
       var preNodePosY = content.gui.position.y;
-      content.gui.position.y = preNodePosY - gapY/2;
-      node.style.top = content.gui.position.y + 'px';
+
+      var y = preNodePosY - gapY/2;
+      content.gui.position.y = y;
+      node.style.top = `${y}px`;
 
       // topLineの修正
       var topLine = document.getElementById(`line-${content.id}`);
@@ -259,7 +259,6 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
         topLine.setAttribute('x1', x);
         //topLine.setAttribute('y1', y);
         content.gui.topLinePosition.origin.x = x;
-        //self.content.gui.topLinePosition.origin.y = y;
       }
 
       // 変更をscenarioArrayに反映して保存

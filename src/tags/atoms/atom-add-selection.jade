@@ -32,11 +32,11 @@ atom-add-selection
       var preHeight = parentGroup.offsetHeight;
 
       // ノードを追加
+      self.content.addedSelectionsCounter++;
       var contentToAdd = {
         label: 'Selection',
         id: `selectionTmp${self.content.num}-selection${self.content.addedSelectionsCounter}`,
       };
-      self.content.addedSelectionsCounter++;
       self.content.selections.push(contentToAdd);
       riot.update();
 

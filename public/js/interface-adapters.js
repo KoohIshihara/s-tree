@@ -36,7 +36,7 @@ var addNode = function(x, y, content, tagName){
   nodeAsDom.style.top = `${y - nodeAsDom.offsetHeight/2}px`;
 
   content.gui.position.x = x;
-  content.gui.position.y = y;
+  content.gui.position.y = y - nodeAsDom.offsetHeight/2;
 
   // go-toの時のtargetEventは選択したノード自体になってしまうためgotoノード以外で行う。
   if(tagName!='item-goto-node' && tagName!='item-goto-another-project-node'){
