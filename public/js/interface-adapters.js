@@ -1,24 +1,3 @@
-// 前のイベントと関連づけする
-var updateNext = function(targetEvent, id){
-
-  if(targetEvent.nodeType=='single' || targetEvent.nodeType=='point'){
-    targetEvent.next = id;
-  }
-
-  if(targetEvent.nodeType=='group'){
-    
-    var selections = targetEvent.selections;
-    for(var i=0; i<selections.length; i++){
-      if(selections[i].id==targetSelectionEventId){
-        selections[i].next = id;
-      }
-    }
-    targetEvent.selections = selections;
-  }
-
-  scenarioUpdateContent(scenarioArray, targetEvent.id, targetEvent);
-}
-
 // ノードを作成する
 createNodeAsDom = function(tagName, content){
 
@@ -61,7 +40,13 @@ var addNode = function(x, y, content, tagName){
 
   // go-toの時のtargetEventは選択したノード自体になってしまうためgotoノード以外で行う。
   if(tagName!='item-goto-node' && tagName!='item-goto-another-project-node'){
-    updateNext(targetEvent, content.id);
+    if(targetEvent.nodeType=='single' || targetEvent.nodeType=='point'){
+      scenarioConnectFromSingleNode(targetEvent, content.id);
+    }else if(targetEvent.nodeType=='group'){
+      scenarioConnectFromGroupNode(targetEvent, content.id);
+    }
+    
+    scenarioUpdateContent(scenarioArray, targetEvent.id, targetEvent);
   }
 
   // イベントをシナリオに追加

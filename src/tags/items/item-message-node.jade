@@ -31,10 +31,6 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
         overflow: hidden;
         position: relative;
         z-index: 2;
-        
-        /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
-        /*box-shadow: 1px 1px 4px rgba(0,0,0,0.4);*/
-
         transform: scale(1);
         .wrap-node-content {
           position: relative;
@@ -69,18 +65,6 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
             resize: none;
             height: 34px;
           }
-          /*
-          .wrap-drag-button {
-            cursor: pointer;
-            height: 34px;
-            .drag-button {
-              background: #2196F3;
-              width: 16px;
-              height: 16px;
-              border-radius: 50%;
-            }
-          }
-          */
         } /* .wrap-node-content */
 
       } /*wrap-node*/
@@ -105,13 +89,8 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
       .start-node-overlay {
         position: absolute;
         z-index: 1;
-        /*background: rgba(33, 150, 243, 0.4);*/
         border: dotted rgba(33,150,243,0.4) 2.4px;
         border-radius: 3px;
-        /*width: 150%;
-        height: 300%;
-        top: -100%;
-        left: -25%;*/
         width: calc(~'100% + 48px');
         height: calc(~'100% + 96px');
         top: -64px;
@@ -197,13 +176,6 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
 
 
     this.on('mount', function(){
-      //self.drag = dragArrow;
-      /*
-      self.drag = function(e){
-        e.stopPropagation();
-        console.log(e);
-      }
-      */
 
       // はじめのノードのtextareaの大きさをテキストの量によって調整
       var node = document.getElementById(self.id);

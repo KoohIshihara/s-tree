@@ -7,7 +7,6 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
   canvasSvg = document.querySelector('#canvasSvg');
   canvasNodes = document.querySelector('#canvasNodes');
   
-
   var width = canvas.offsetWidth;
   var height = canvas.offsetHeight;
 
@@ -40,7 +39,7 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
   }
 
 
-  // lineを追加
+  // 全てのlineを追加（ノードの座標から始点と終点を計算して線を引く）
   for(var i=0; i<scenarioArray.length; i++){
     var event = scenarioArray[i];
     var nodeType = scenarioArray[i].nodeType;
@@ -144,15 +143,11 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
 
 }
 
-
-
-
 //-------------------------------------------------------------
 
 var targetId;
 var targetEvent;
 var targetSelectionEventId
-var targetEventNodeType;
 
 var x, y;
 //マウスが押された際の関数
@@ -174,8 +169,6 @@ var mdownOnNode = function(e) {
       break;
     }
   }
-  targetEventNodeType = targetEvent.nodeType;
-
 
   //クラス名に .drag を追加
   this.classList.add("drag");
@@ -236,7 +229,7 @@ var mmoveOnNode = function(e) {
     topLine.setAttribute("y1", parseInt(topLine.getAttribute("y1")) + gapY);
   }
 
-  if(targetEventNodeType=='group'){
+  if(targetEvent.nodeType=='group'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
       if(selections[i].topLineId){
@@ -307,8 +300,6 @@ var mupOnNode = function(e) {
 
 
 
-
-
 // 扱っているlineの始点と終点
 var arrowOrigin = {};
 var arrowTo = {};
@@ -331,9 +322,8 @@ var mdownOnLineStart = function(e){
   targetId = $(e.target).parents('.node')[0].dataset.id;
   
   targetEvent = getEventFromScenarioById(targetId);
-  targetEventNodeType = targetEvent.nodeType;
 
-  if(targetEventNodeType=='group'){
+  if(targetEvent.nodeType=='group'){
     targetSelectionEventId = e.target.dataset.selectionid;
   }
 
@@ -405,7 +395,7 @@ var upOnLineStart = function(e){
   topLine.classList.add('unsaved');
 
 
-  if(targetEventNodeType=='single' || targetEventNodeType=='point'){
+  if(targetEvent.nodeType=='single' || targetEvent.nodeType=='point'){
     // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
     var preTopLine = document.querySelector(`#${targetEvent.gui.topLineId}`);
     if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
@@ -418,7 +408,7 @@ var upOnLineStart = function(e){
 
     targetEvent.gui.topLinePosition = {origin: from, to: to};
 
-  }else if(targetEventNodeType=='group'){
+  }else if(targetEvent.nodeType=='group'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
       if(targetSelectionEventId==selections[i].id){
@@ -452,7 +442,7 @@ var upOnLineStart = function(e){
 
 
     // nextイベントをマウスオーバーしているテンプレートのイベントに紐付け
-    if(targetEventNodeType=='single' || targetEventNodeType=='point'){
+    if(targetEvent.nodeType=='single' || targetEvent.nodeType=='point'){
 
       targetEvent.next = idOfOverTemplate;
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
@@ -460,7 +450,7 @@ var upOnLineStart = function(e){
       targetEvent.gui.topLinePosition = {origin: from, to: to};
       targetEvent.topLineId = `line-${targetId}`;
 
-    }else if(targetEventNodeType=='group'){
+    }else if(targetEvent.nodeType=='group'){
 
       for(var i=0; i<targetEvent.selections.length; i++){
         if(targetEvent.selections[i].id==targetSelectionEventId){
@@ -474,7 +464,6 @@ var upOnLineStart = function(e){
 
     }
 
-    //saveScenario();
     saveScenarioAsSubcollection();
 
   }else{

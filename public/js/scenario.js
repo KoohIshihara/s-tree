@@ -15,8 +15,25 @@ function scenarioAddContent(scenario, content) {
   scenario.push(content);
 }
 
-// TO DOあるidのnextを持つsingle nodeを取り出す
 
+function scenarioConnectFromSingleNode(from, toId) {
+  from.next = toId;
+}
+
+
+function scenarioConnectFromGroupNode(from, toId) {
+  var selections = from.selections;
+  for(var i=0; i<selections.length; i++){
+    if(selections[i].id==targetSelectionEventId){
+      selections[i].next = toId;
+      break;
+    }
+  }
+  from.selections = selections;
+}
+
+
+// TO DOあるidのnextを持つsingle nodeを取り出す
 
 
 // TO DOあるidのnextを持つgroup nodeを取り出す
