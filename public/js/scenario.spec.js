@@ -25,6 +25,11 @@ describe("scenario", () => {
     expect(sc.scenarioGetId(myScenario, 0)).toBe(1);
   });
 
+  it('returns the id when passed a valid scenario index and selection index', () => {
+    myScenario.push({ id: 1, selections: [{ id: 2}] });
+    expect(sc.scenarioGetId(myScenario, 0, 0)).toBe(2);
+  });
+
   it('returns null when passed an invalid id', () => {
     myScenario.push({ id: 1, text: "hello" });
     expect(sc.scenarioGetContent(myScenario, 777)).toBe(null);
@@ -216,6 +221,29 @@ describe("scenario", () => {
     myScenario.push({ type: "goto", toId: 2 });
     myScenario.push({ type: "openquestion", toId: 3 });
     expect(sc.scenarioGetGoToEventsThatJumpTo(myScenario, 3).length).toBe(0);
+  });
+
+  it("calls drawNode scenario size times", () => {
+    myScenario.push({ id: 1 });
+    myScenario.push({ id: 2 });
+    const mockDrawNode = jest.fn((scenario, i) => { ; });
+    sc.scenarioDrawNodes(myScenario, mockDrawNode);
+    expect(mockDrawNode.mock.calls.length).toBe(myScenario.length);
+  });
+
+  it("calls drawLine scenario size times", () => {
+    myScenario.push({ id: 1 });
+    myScenario.push({ id: 2 });
+    const mockDrawLine = jest.fn((scenario, i) => { ; });
+    sc.scenarioDrawLines(myScenario, mockDrawLine);
+    expect(mockDrawLine.mock.calls.length).toBe(myScenario.length);
+  });
+
+  it("calls drawLine selections size times", () => {
+    myScenario.push({ id: 1, selections: [{ next: 2, text: "hi" }, { next: 3, text: "hi hi" }]});
+    const mockDrawLine = jest.fn((selections, i) => { ; });
+    sc.scenarioGroupDrawLines(myScenario, 0, mockDrawLine);
+    expect(mockDrawLine.mock.calls.length).toBe(myScenario[0].selections.length);
   });
 
 });

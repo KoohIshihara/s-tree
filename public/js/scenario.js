@@ -1,5 +1,10 @@
 // scenario
 
+function scenarioGetContentByIndex(scenario, index) {
+  return scenario[index];
+}
+module.exports.scenarioGetContentByIndex = scenarioGetContentByIndex;
+
 function scenarioGetContent(scenario, id) {
   for (var i = 0; i < scenario.length; i++) {
     if (scenario[i].id == id) {
@@ -25,12 +30,9 @@ function scenarioGetSize(scenario) {
 }
 module.exports.scenarioGetSize = scenarioGetSize;
 
-function scenarioGetId(scenario, index) {
-  if (-1 < index && index < scenario.length) {
-    return scenario[index].id;
-  } else {
-    throw new Error('Index Out of Bounds');
-  }
+function scenarioGetId(scenario, scenarioIndex, selectionIndex = -1) {
+  return (selectionIndex == -1) ?
+    scenario[scenarioIndex].id : scenario[scenarioIndex].selections[selectionIndex].id;
 }
 module.exports.scenarioGetId = scenarioGetId;
 
@@ -181,6 +183,36 @@ function scenarioGetGoToEventsThatJumpTo(scenario, id) {
 }
 module.exports.scenarioGetGoToEventsThatJumpTo = scenarioGetGoToEventsThatJumpTo;
 
+function scenarioIsSingle(scenario, index) {
+  return scenario[index].nodeType == 'single';
+}
+module.exports.scenarioIsSingle = scenarioIsSingle;
+
+function scenarioIsGroup(scenario, index) {
+  return scenario[index].nodeType == 'group';
+}
+module.exports.scenarioIsGroup = scenarioIsGroup;
+
+function scenarioIsNormal(scenario, index) {
+  return scenario[index].type == 'normal';
+}
+module.exports.scenarioIsNormal = scenarioIsNormal;
+
+function scenarioIsOpenQuestion(scenario, index) {
+  return scenario[index].type == 'openquestion';
+}
+module.exports.scenarioIsOpenQuestion = scenarioIsOpenQuestion;
+
+function scenarioIsGoTo(scenario, index) {
+  return scenario[index].type == 'goto';
+}
+module.exports.scenarioIsGoTo = scenarioIsGoTo;
+
+function scenarioIsGoToAnotherProject(scenario, index) {
+  return scenario[index].type == 'gotoAnotherProject';
+}
+module.exports.scenarioIsGoToAnotherProject = scenarioIsGoToAnotherProject;
+
 // scenarioHistories
 
 const MAX_HISTORY = 10;
@@ -211,3 +243,47 @@ function scenarioHistoriesGetHistory(scenarioHistory, index) {
   return scenarioHistory[scenarioHistory.length - index];
 }
 module.exports.scenarioHistoriesGetHistory = scenarioHistoriesGetHistory;
+
+// Drawing
+
+function scenarioDrawNodes(scenario, drawNode) {
+  for (var i = 0; i < scenario.length; i++) {
+    drawNode(scenario, i);
+  }
+}
+module.exports.scenarioDrawNodes = scenarioDrawNodes;
+
+function scenarioDrawLines(scenario, drawLine) {
+  for (var i = 0; i < scenario.length; i++) {
+    drawLine(scenario, i);
+  }
+}
+module.exports.scenarioDrawLines = scenarioDrawLines;
+
+function scenarioGetTopLinePosition(scenario, index) {
+  return scenario[index].gui.topLinePosition;
+}
+module.exports.scenarioGetTopLinePosition = scenarioGetTopLinePosition;
+
+function scenarioGetTopLineId(scenario, index) {
+  return scenario[index].gui.topLineId;
+}
+module.exports.scenarioGetTopLineId = scenarioGetTopLineId;
+
+function scenarioGroupDrawLines(scenario, index, drawLine) {
+  var selections = scenario[index].selections;
+  for (var i = 0; i < selections.length; i++) {
+    drawLine(selections, i);
+  }
+}
+module.exports.scenarioGroupDrawLines = scenarioGroupDrawLines;
+
+function scenarioSelectionGetTopLinePosition(selections, index) {
+  return selections[index].topLinePosition;
+}
+module.exports.scenarioSelectionGetTopLinePosition = scenarioSelectionGetTopLinePosition;
+
+function scenarioSelectionGetTopLineId(selections, index) {
+  return selections[index].topLineId;
+}
+module.exports.scenarioSelectionGetTopLineId = scenarioSelectionGetTopLineId;

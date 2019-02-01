@@ -77,7 +77,8 @@ atom-delete-node
       for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
         var index = preIndexesOfSelectionNodes[i];
       
-        var lineName = `line-${scenarioArray[index.scenarioIndex].selections[index.selectionIndex].id}`;
+        //- var lineName = `line-${scenarioArray[index.scenarioIndex].selections[index.selectionIndex].id}`;
+        var lineName = `line-${scenarioGetId(scenarioArray, index.scenarioIndex, index.selectionIndex)}`;
         var line = document.getElementById(lineName);
         if(line) line.parentNode.removeChild(line);
       }

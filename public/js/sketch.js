@@ -11,57 +11,119 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
   var height = canvas.offsetHeight;
 
   // nodeを追加
-  var event;
-  for(var i=0; i<scenarioArray.length; i++){
+  // var event;
+  // for(var i=0; i<scenarioArray.length; i++){
     
-    event = scenarioArray[i];
+  //   event = scenarioArray[i];
+  //   var pos = event.gui.position;
+  
+  //   // if(scenarioArray[i].nodeType == 'single'){
+  //   //   if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
+  //   //   if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
+  //   //   if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
+  //   //   if(scenarioArray[i].type=='gotoAnotherProject') addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+  //   // }
+  //   // if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
+    
+  //   if (scenarioIsSingle(scenarioArray, i)) {
+  //     if (scenarioIsNormal(scenarioArray, i)) addSimpleMessage(pos.x, pos.y, event, true);
+  //     if (scenarioIsOpenQuestion(scenarioArray, i)) addOpenQuestion(pos.x, pos.y, event, true);
+  //     if (scenarioIsGoTo(scenarioArray, i)) addGoToNode(pos.x, pos.y, event, true);
+  //     if (scenarioIsGoToAnotherProject(scenarioArray, i)) addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+  //   }
+  //   if (scenarioIsGroup(scenarioArray, i)) addSelections(pos.x, pos.y, event, true);
+
+  //   // if(letScrollToFirst && firstEventId==scenarioArray[i].id){
+  //   if (letScrollToFirst && firstEventId == scenarioGetId(scenarioArray, i)) {
+  //       // はじめのメッセージのところまでスクロール
+  //     document.querySelector('module-canvas').scrollLeft = pos.x - 100;
+  //     document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
+
+  //     // firstのイベントにフォーカスさせる
+  //     // focusNode(scenarioArray[i]);
+  //     focusNode(scenarioGetContentByIndex(scenarioArray, i));
+  //   }
+
+  // }
+
+  scenarioDrawNodes(scenarioArray, (scenarioArray, i) => {
+    var event = scenarioGetContentByIndex(scenarioArray, i);
     var pos = event.gui.position;
   
-    if(scenarioArray[i].nodeType == 'single'){
-      if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='gotoAnotherProject') addGoToAnotherProjectNode(pos.x, pos.y, event, true);
-    }
-    if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
+    // if(scenarioArray[i].nodeType == 'single'){
+    //   if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
+    //   if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
+    //   if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
+    //   if(scenarioArray[i].type=='gotoAnotherProject') addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+    // }
+    // if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
-    if(letScrollToFirst && firstEventId==scenarioArray[i].id){
-      // はじめのメッセージのところまでスクロール
+    if (scenarioIsSingle(scenarioArray, i)) {
+      if (scenarioIsNormal(scenarioArray, i)) addSimpleMessage(pos.x, pos.y, event, true);
+      if (scenarioIsOpenQuestion(scenarioArray, i)) addOpenQuestion(pos.x, pos.y, event, true);
+      if (scenarioIsGoTo(scenarioArray, i)) addGoToNode(pos.x, pos.y, event, true);
+      if (scenarioIsGoToAnotherProject(scenarioArray, i)) addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+    }
+    if (scenarioIsGroup(scenarioArray, i)) addSelections(pos.x, pos.y, event, true);
+
+    // if(letScrollToFirst && firstEventId==scenarioArray[i].id){
+    if (letScrollToFirst && firstEventId == scenarioGetId(scenarioArray, i)) {
+        // はじめのメッセージのところまでスクロール
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
       document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
 
       // firstのイベントにフォーカスさせる
-      focusNode(scenarioArray[i]);
+      // focusNode(scenarioArray[i]);
+      focusNode(scenarioGetContentByIndex(scenarioArray, i));
     }
-
-  }
-
+  })
 
   // lineを追加
-  for(var i=0; i<scenarioArray.length; i++){
-    var nodeType = scenarioArray[i].nodeType;
-    if(nodeType == 'single'){
-      if(scenarioArray[i].gui.topLinePosition){
-        var pos = scenarioArray[i].gui.topLinePosition;
+  // for(var i=0; i<scenarioArray.length; i++){
+  //   var nodeType = scenarioArray[i].nodeType;
+  //   if(nodeType == 'single'){
+  //     if(scenarioArray[i].gui.topLinePosition){
+  //       var pos = scenarioArray[i].gui.topLinePosition;
+  //       var from = {x: pos.origin.x, y: pos.origin.y};
+  //       var to = {x: pos.to.x, y: pos.to.y};
+  //       var topLineId = scenarioArray[i].gui.topLineId;
+  //       addLine(from, to, topLineId);
+  //     }
+  //   }else if(nodeType == 'group'){
+  //     var selections = scenarioArray[i].selections;
+  //     for(var selection_i=0; selection_i<selections.length; selection_i++){
+  //       if(selections[selection_i].topLinePosition){
+  //         var pos = selections[selection_i].topLinePosition;
+  //         var from = {x: pos.origin.x, y: pos.origin.y};
+  //         var to = {x: pos.to.x, y: pos.to.y};
+  //         var topLineId = selections[selection_i].topLineId;
+  //         addLine(from, to, topLineId);
+  //       }
+  //     }
+  //   }
+  // } // for
+
+  scenarioDrawLines(scenarioArray, (scenarioArray, i) => {
+    if(scenarioIsSingle(scenarioArray, i)) {
+      if(scenarioGetTopLinePosition(scenarioArray, i)){
+        var pos = scenarioGetTopLinePosition(scenarioArray, i);
         var from = {x: pos.origin.x, y: pos.origin.y};
         var to = {x: pos.to.x, y: pos.to.y};
-        var topLineId = scenarioArray[i].gui.topLineId;
+        var topLineId = scenarioGetTopLineId(scenarioArray, i);
         addLine(from, to, topLineId);
       }
-    }else if(nodeType == 'group'){
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].topLinePosition){
-          var pos = selections[selection_i].topLinePosition;
+    }else if(scenarioIsGroup(scenarioArray, i)){
+      scenarioGroupDrawLines(scenarioArray, i, (selections, j) => {
+        if(scenarioSelectionGetTopLinePosition(selections, j)){
+          var pos = scenarioSelectionGetTopLinePosition(selections, j);
           var from = {x: pos.origin.x, y: pos.origin.y};
           var to = {x: pos.to.x, y: pos.to.y};
-          var topLineId = selections[selection_i].topLineId;
+          var topLineId = scenarioSelectionGetTopLineId(selections, j);
           addLine(from, to, topLineId);
         }
-      }
+      })
     }
-  } // for
-
+  })
 
   // goto用のlineを追加
   var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -403,12 +465,13 @@ var mdownOnNode = function(e) {
   }
 
   targetId = $(e.target).parents('.node')[0].dataset.id;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(targetId==scenarioArray[i].id){
-      targetEvent = scenarioArray[i];
-      break;
-    }
-  }
+  // for(var i=0; i<scenarioArray.length; i++){
+  //   if(targetId==scenarioArray[i].id){
+  //     targetEvent = scenarioArray[i];
+  //     break;
+  //   }
+  // }
+  targetEvent = scenarioGetContent(scenarioArray, targetId);
   targetEventNodeType = targetEvent.nodeType;
 
 
@@ -499,7 +562,8 @@ var mmoveOnNode = function(e) {
     bLine.setAttribute("y2", parseInt(bLine.getAttribute("y2")) + gapY);
   }
 
-  var preSelectionNodes = getSelectionsFromScenarioByNext(targetId);
+  // var preSelectionNodes = getSelectionsFromScenarioByNext(targetId);
+  var preSelectionNodes = scenarioGetSelectionsThatConnectTo(scenarioArray, targetId);
   for(var i=0; i<preSelectionNodes.length; i++){
     preSelectionNodes[i].topLinePosition.to.x += gapX;
     preSelectionNodes[i].topLinePosition.to.y += gapY;
