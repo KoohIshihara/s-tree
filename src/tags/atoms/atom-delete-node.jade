@@ -44,6 +44,12 @@ atom-delete-node
         delete scenarioArray[index.scenarioIndex].gui.topLineId;
       }
 
+      // deleteをentitiesで書き換えてるところ debugger
+      var singleNodes = scenarioGetNodesThatConnectTo(scenarioArray, id);
+      for(var i=0; i<singleNodes; i++){
+
+      }
+
       var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(id);
       for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
         var index = preIndexesOfSelectionNodes[i];
