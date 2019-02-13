@@ -109,7 +109,7 @@ atom-open-question-answer
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);
       self.saveTimer = setTimeout(function(){
-        saveScenarioAsSubcollection(self.content);
+        saveScenarioAsSubcollection();
       }, 800);
 
     }

@@ -1,7 +1,6 @@
 item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
   div.wrap-node
     div.wrap-node-content
-      //p.question-text.mb8 {questionText}
       div.wrap-question-text.px8.pt10
         textarea(onkeyup='{updateQuestionText.bind(e, this)}').question-textarea {questionText}
         p.hidden-text {questionText}
@@ -189,6 +188,28 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
     this.out = moutTemplate;
 
 
+    this.on('mount', function(){
+
+      // はじめのノードのtextareaの大きさをテキストの量によって調整
+      var node = document.getElementById(self.id);
+      var nodeText = node.getElementsByClassName('hidden-text')[0];
+      if(self.questionText=='') self.questionText = 'Question Message';
+      nodeText.innerText = self.questionText;
+
+      // ノードのテキストを更新
+      var hiddenText = self.root.getElementsByClassName('hidden-text')[0];
+      var textarea = self.root.getElementsByClassName('question-textarea')[0];
+
+      hiddenText.innerHTML = self.questionText;//textarea.value;
+
+      var w = hiddenText.offsetWidth;
+      var h = hiddenText.offsetHeight;
+      
+      textarea.style.width = `${w+20}px`;
+      textarea.style.height = `${h}px`;
+
+    });
+
 
     this.updateQuestionText = function(self, e){
 
@@ -219,19 +240,23 @@ item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}
       e.target.style.height = `${h}px`;
 
 
-
       // 変更してずれる座標分の修正
       var gapX = node.offsetWidth - preWidth;
       var gapY = node.offsetHeight - preHeight;
 
       // nodeの座標をtopLineが中心になるように修正
-      var content = getEventFromScenarioById(self.id);
+      var content = scenarioGetContent(scenarioArray, self.id);
       var preNodePosY = content.gui.position.y;
-      content.gui.position.y = preNodePosY - gapY/2;
+      scenarioUpdatePosition(scenarioArray, content.id, {
+        x: content.gui.position.x,
+        y: preNodePosY - gapY/2,
+      });
       node.style.top = content.gui.position.y + 'px';
 
       // textをシナリオデータに反映
       content.text = e.target.value;
+
+      scenarioUpdateContent(scenarioArray, content.id, content);
 
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);

@@ -1,3 +1,4 @@
+var currentScenarioArrayForConversation;
 var currentProjectForConversation;
 var underAnotherProject = false;
 

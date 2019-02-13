@@ -10,114 +10,146 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
   var width = canvas.offsetWidth;
   var height = canvas.offsetHeight;
 
+  /*
   // nodeを追加
   var event;
   for(var i=0; i<scenarioArray.length; i++){
     
     event = scenarioArray[i];
     var pos = event.gui.position;
-  
-    if(scenarioArray[i].nodeType == 'single'){
-      if(scenarioArray[i].type=='normal') loadNode(pos.x, pos.y, event, 'item-message-node'); //addSimpleMessage(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='openquestion') loadNode(pos.x, pos.y, event, 'item-open-question-node'); //addOpenQuestion(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='goto') loadNode(pos.x, pos.y, event, 'item-goto-node'); //addGoToNode(pos.x, pos.y, event, true);
-      if(scenarioArray[i].type=='gotoAnotherProject') loadNode(pos.x, pos.y, event, 'item-goto-another-project-node'); //addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+
+    if(scenarioIsSingle(scenarioArray, i)){
+      if(scenarioIsNormal(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-message-node'); //addSimpleMessage(pos.x, pos.y, event, true);
+      if(scenarioIsOpenQuestion(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-open-question-node'); //addOpenQuestion(pos.x, pos.y, event, true);
+      if(scenarioIsGoTo(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-goto-node'); //addGoToNode(pos.x, pos.y, event, true);
+      if(scenarioIsGoToAnotherProject(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-goto-another-project-node'); //addGoToAnotherProjectNode(pos.x, pos.y, event, true);
     }
-    if(scenarioArray[i].nodeType == 'group'){
+    if(scenarioIsGroup(scenarioArray, i)){
       loadNode(pos.x, pos.y, event, 'item-selection-node'); //addSelections(pos.x, pos.y, event, true);
     }
     
-    if(letScrollToFirst && firstEventId==scenarioArray[i].id){
+    if(letScrollToFirst && firstEventId==scenarioGetId(scenarioArray, i)){
       // はじめのメッセージのところまでスクロール
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
       document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
 
       // firstのイベントにフォーカスさせる
-      focusNode(scenarioArray[i]);
+      focusNode(scenarioGetContentByIndex(scenarioArray, i));
     }
 
   }
+  */
+
+
+  scenarioDrawNodes(scenarioArray, (scenarioArray, i) => {
+
+    var event = scenarioGetContentByIndex(scenarioArray, i);
+    var pos = event.gui.position;
+  
+    if(scenarioIsSingle(scenarioArray, i)){
+      if(scenarioIsNormal(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-message-node'); //addSimpleMessage(pos.x, pos.y, event, true);
+      if(scenarioIsOpenQuestion(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-open-question-node'); //addOpenQuestion(pos.x, pos.y, event, true);
+      if(scenarioIsGoTo(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-goto-node'); //addGoToNode(pos.x, pos.y, event, true);
+      if(scenarioIsGoToAnotherProject(scenarioArray, i)) loadNode(pos.x, pos.y, event, 'item-goto-another-project-node'); //addGoToAnotherProjectNode(pos.x, pos.y, event, true);
+    }
+    if(scenarioIsGroup(scenarioArray, i)){
+      loadNode(pos.x, pos.y, event, 'item-selection-node'); //addSelections(pos.x, pos.y, event, true);
+    }
+    
+    if(letScrollToFirst && firstEventId==scenarioGetId(scenarioArray, i)){
+      // はじめのメッセージのところまでスクロール
+      document.querySelector('module-canvas').scrollLeft = pos.x - 100;
+      document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
+
+      // firstのイベントにフォーカスさせる
+      focusNode(scenarioGetContentByIndex(scenarioArray, i));
+    }
+
+  })
 
 
   // 全てのlineを追加（ノードの座標から始点と終点を計算して線を引く）
-  for(var i=0; i<scenarioArray.length; i++){
-    var event = scenarioArray[i];
-    var nodeType = scenarioArray[i].nodeType;
-    if(nodeType == 'single'){
-      
-      if(event.next){
-        var node = document.getElementById(event.id);
+  scenarioDrawLines(scenarioArray, (scenarioArray, i) => {
+    if(scenarioIsSingle(scenarioArray, i)) {
+
+      if(scenarioGetNext(scenarioArray, i)){
+        var node = document.getElementById(scenarioGetId(scenarioArray, i));
         var boundingRect = node.getBoundingClientRect();
+
+        var pos = scenarioGetNodePosition(scenarioArray, i);
+
         var from = {
-          x: event.gui.position.x + boundingRect.width + 10,
-          y: event.gui.position.y + boundingRect.height/2,
+          x: pos.x + boundingRect.width + 10,
+          y: pos.y + boundingRect.height/2,
         };
 
-        var nextId = event.next;
-        var nextEvent = getEventFromScenarioById(nextId);
+        var nextId = scenarioGetNext(scenarioArray, i);
+        var nextEvent = scenarioGetContent(scenarioArray, nextId);
         var nextNode = document.getElementById(nextId);
+        
+        var nextPos = nextEvent.gui.position;
 
         if(nextNode){
+          var nextBoundingRect = nextNode.getBoundingClientRect();
+          var to = {
+            x: nextPos.x,
+            y: nextPos.y + nextBoundingRect.height/2,
+          };
+
+          var topLineId = scenarioGetTopLineId(scenarioArray, i);
+
+          addLine(from, to, topLineId);
+        }
+      }
+
+    }else if(scenarioIsGroup(scenarioArray, i)){
+
+      scenarioGroupDrawLines(scenarioArray, i, (selections, j) => {
+
+        var groupNodePos = scenarioGetNodePosition(scenarioArray, i);
+        var groupNode = document.getElementById(scenarioGetId(scenarioArray, i));
+        var groupNodeBoundingRect = groupNode.getBoundingClientRect();
+
+        if(scenarioSelectionGetNext(selections, j)){
+          
+          var selectionId = scenarioSelectionGetId(selections, j);
+          var node = document.getElementById(selectionId);
+          var boundingRect = node.getBoundingClientRect();
+          var relativePos = $(`#${selectionId}`).position();
+          
+          var from = {
+            x: groupNodePos.x + groupNodeBoundingRect.width + 8,
+            y: groupNodePos.y + relativePos.top + boundingRect.height/2,
+          };
+
+          var nextId = scenarioSelectionGetNext(selections, j);
+          var nextEvent = scenarioGetContent(scenarioArray, nextId);
+          var nextNode = document.getElementById(nextId);
+
           var nextBoundingRect = nextNode.getBoundingClientRect();
           var to = {
             x: nextEvent.gui.position.x,
             y: nextEvent.gui.position.y + nextBoundingRect.height/2,
           };
 
-          var topLineId = event.gui.topLineId;
-
+          var topLineId = scenarioSelectionGetTopLineId(selections, j);
           addLine(from, to, topLineId);
-        }
-      }
-    }else if(nodeType == 'group'){
-      var event = getEventFromScenarioById(event.id);
-      var groupNodePos = event.gui.position;
-      var groupNode = document.getElementById(event.id);
-      var groupNodeBoundingRect = groupNode.getBoundingClientRect();
-
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-
-        var selection = selections[selection_i];
-
-        if(selection.next){
           
-          var node = document.getElementById(selection.id);
-          var boundingRect = node.getBoundingClientRect();
-          var relativePos = $(`#${selection.id}`).position();
-          var from = {
-            x: groupNodePos.x + groupNodeBoundingRect.width + 8,
-            y: groupNodePos.y + relativePos.top + boundingRect.height/2,
-          };
+        } // scenarioGroupDrawLines
 
-          var nextId = selection.next;
-          var nextEvent = getEventFromScenarioById(nextId);
-          var nextNode = document.getElementById(nextId);
+      }) // scenarioGroupDrawLines
 
-          if(nextNode){
-            var nextBoundingRect = nextNode.getBoundingClientRect();
-            var to = {
-              x: nextEvent.gui.position.x,
-              y: nextEvent.gui.position.y + nextBoundingRect.height/2,
-            };
+    }else if(scenarioIsPoint(scenarioArray, i)){
 
-            var topLineId = selection.topLineId;
-
-            addLine(from, to, topLineId);
-          }
-
-        }
-      }
-    }else if(nodeType == 'point'){
-      if(event.next){
-        var node = document.getElementById(event.id);
+      if(scenarioGetNext(scenarioArray, i)){
+        var node = document.getElementById(scenarioGetNext(scenarioArray, i));
         var boundingRect = node.getBoundingClientRect();
         var from = {
           x: 100 + 14/2,
           y: 100000/2 + 14/2,
         };
 
-        var nextId = event.next;
+        var nextId = scenarioGetNext(scenarioArray, i);
         var nextEvent = getEventFromScenarioById(nextId);
         var nextNode = document.getElementById(nextId);
         var nextBoundingRect = nextNode.getBoundingClientRect();
@@ -126,15 +158,15 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
           y: nextEvent.gui.position.y + nextBoundingRect.height/2,
         };
 
-        var topLineId = event.gui.topLineId;
-
+        var topLineId = scenarioGetTopLineId(scenarioArray, i);
         addLine(from, to, topLineId);
       }
+
     }
-  } // for
+  }) // scenarioDrawLines
 
 
-  // goto用のlineを追加
+  // gotoのプレヴュー用のlineを追加
   var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
   topLine.setAttribute('stroke', '#FF4081');
   topLine.setAttribute('id', 'lineForGoToPreview');
@@ -145,7 +177,6 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
 
 //-------------------------------------------------------------
 
-var targetId;
 var targetEvent;
 var targetSelectionEventId
 
@@ -156,19 +187,10 @@ var mdownOnNode = function(e) {
   e.stopPropagation();
   
   //タッチデイベントとマウスのイベントの差異を吸収
-  if(e.type === "mousedown"){
-    var event = e;
-  }else{
-    var event = e.changedTouches[0];
-  }
+  var event = (e.type == "mousedown") ? e : e.changedTouches[0];
 
-  targetId = $(e.target).parents('.node')[0].dataset.id;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(targetId==scenarioArray[i].id){
-      targetEvent = scenarioArray[i];
-      break;
-    }
-  }
+  var targetId = $(e.target).parents('.node')[0].dataset.id;
+  targetEvent = scenarioGetContent(scenarioArray, targetId);
 
   //クラス名に .drag を追加
   this.classList.add("drag");
@@ -177,7 +199,6 @@ var mdownOnNode = function(e) {
   x = event.pageX - this.offsetLeft;
   y = event.pageY - this.offsetTop;
 
-  
   //ムーブイベントにコールバック
   document.body.addEventListener("mousemove", mmoveOnNode, false);
   document.body.addEventListener("touchmove", mmoveOnNode, false);
@@ -193,12 +214,8 @@ var mmoveOnNode = function(e) {
 
   e.stopPropagation();
   
-  //同様にマウスとタッチの差異を吸収
-  if(e.type === "mousemove") {
-    var event = e;
-  } else {
-    var event = e.changedTouches[0];
-  }
+  // タッチデイベントとマウスのイベントの差異を吸収
+  var event = (e.type == "mousemove") ? e : e.changedTouches[0];
 
   //フリックしたときに画面を動かさないようにデフォルト動作を抑制
   e.preventDefault();
@@ -208,23 +225,23 @@ var mmoveOnNode = function(e) {
   var preLeft = drag.style.left;
   var preTop = drag.style.top;
 
-  //マウスが動いた場所に要素を動かす
+  // マウスが動いた場所に要素を動かす
   drag.style.left = event.pageX - x + "px";
   drag.style.top = event.pageY - y + "px";
 
-  targetEvent.gui.position.x = event.pageX - x;
-  targetEvent.gui.position.y = event.pageY - y;
+  scenarioUpdatePosition(scenarioArray, targetEvent.id, {
+    x: event.pageX - x,
+    y: event.pageY - y
+  });
 
+  scenarioUpdateContent(scenarioArray, targetEvent.id, targetEvent);
 
   var gapX = parseInt(drag.style.left) - parseInt(preLeft);
   var gapY = parseInt(drag.style.top) - parseInt(preTop);
 
   // 次のテンプレートにつないでいるlineの始点を修正
-  var topLine = document.querySelector(`#${targetEvent.gui.topLineId}`);//targetEvent.gui.topLine;
-  if(topLine){
-    //targetEvent.gui.topLinePosition.origin.x += gapX;
-    //targetEvent.gui.topLinePosition.origin.y += gapY;
-    
+  var topLine = document.querySelector(`#${targetEvent.gui.topLineId}`); //targetEvent.gui.topLine;
+  if(topLine){    
     topLine.setAttribute("x1", parseInt(topLine.getAttribute("x1")) + gapX);
     topLine.setAttribute("y1", parseInt(topLine.getAttribute("y1")) + gapY);
   }
@@ -245,26 +262,23 @@ var mmoveOnNode = function(e) {
   }
 
   // 前のテンプレートからつながってるlineの終点を修正
-  var preNormalNodes = getNormalNodesFromScenarioByNext(targetId);
+  var preNormalNodes = scenarioGetNodesThatConnectTo(scenarioArray, targetEvent.id);
   for(var i=0; i<preNormalNodes.length; i++){
-    //preNormalNodes[i].gui.topLinePosition.to.x += gapX;
-    //preNormalNodes[i].gui.topLinePosition.to.y += gapY;
     var bLineId = preNormalNodes[i].gui.topLineId;
     var bLine = document.querySelector(`#${bLineId}`);
     bLine.setAttribute("x2", parseInt(bLine.getAttribute("x2")) + gapX);
     bLine.setAttribute("y2", parseInt(bLine.getAttribute("y2")) + gapY);
   }
 
-  var preSelectionNodes = getSelectionsFromScenarioByNext(targetId);
+  var preSelectionNodes = scenarioGetSelectionsThatConnectTo(scenarioArray, targetEvent.id);
   for(var i=0; i<preSelectionNodes.length; i++){
-    //preSelectionNodes[i].topLinePosition.to.x += gapX;
-    //preSelectionNodes[i].topLinePosition.to.y += gapY;
     var bLineId = preSelectionNodes[i].topLineId;
     var bLine = document.querySelector(`#${bLineId}`);
     bLine.setAttribute("x2", parseInt(bLine.getAttribute("x2")) + gapX);
     bLine.setAttribute("y2", parseInt(bLine.getAttribute("y2")) + gapY);
   }
 
+  
   
 }
 
@@ -281,18 +295,14 @@ var mupOnNode = function(e) {
     //クラス名 .drag も消す
     drag.classList.remove("drag");
 
-    //saveScenario();
-    console.log('mupOnNode');
     saveScenarioAsSubcollection();
   }
 
   //ムーブベントハンドラの消去
   document.body.removeEventListener("mousemove", mmoveOnNode, false);
   document.body.removeEventListener("touchmove", mmoveOnNode, false);
- 
+
 }
-
-
 
 
 
@@ -301,7 +311,7 @@ var mupOnNode = function(e) {
 
 
 // 扱っているlineの始点と終点
-var arrowOrigin = {};
+var arrowFrom = {};
 var arrowTo = {};
 
 // ドラック中かどうかを判定
@@ -312,39 +322,34 @@ var mdownOnLineStart = function(e){
   
   isDraging = true;
 
-  if(e.type === "mousedown") {
-    var event = e;
-  } else {
-    var event = e.changedTouches[0];
-  }
+  // タッチデイベントとマウスのイベントの差異を吸収
+  var event = (e.type == "mousedown") ? e : e.changedTouches[0];
 
   // 操作しているテンプレートに紐づくイベントを取得
-  targetId = $(e.target).parents('.node')[0].dataset.id;
-  
-  targetEvent = getEventFromScenarioById(targetId);
+  var targetId = $(e.target).parents('.node')[0].dataset.id;
+  targetEvent = scenarioGetContent(scenarioArray, targetId);
 
-  if(targetEvent.nodeType=='group'){
-    targetSelectionEventId = e.target.dataset.selectionid;
-  }
+  // イベントがgroupだった場合、グループの子ノードのidを取得する
+  if(targetEvent.nodeType=='group') targetSelectionEventId = e.target.dataset.selectionid;
 
   // lineの始点を取得
   var button = event.target.getBoundingClientRect();
-  // インスペクタの大きさ分を考慮
-  //var leftOffset = document.querySelector('inspector').offsetWidth;
-  var buttonOffset = 8/2; //16/2; // 8はボタンの半径
-  arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft; //- leftOffset;
-  arrowOrigin.y = button.top + buttonOffset + canvas.scrollTop-48;
+
+  var radiusOfButton = 8;
+  var buttonOffset = radiusOfButton/2;
+  arrowFrom.x = button.left + buttonOffset + canvas.scrollLeft;
+  arrowFrom.y = button.top + buttonOffset + canvas.scrollTop-48;
 
 
-  // セーブされていないlineがあったら削除してポップがでてたらそれも消す
-  var unsavedLine = document.querySelector('.unsaved');
-  if(unsavedLine){
-    unsavedLine.parentNode.removeChild(unsavedLine);
+  // 始点がNodeに接続されていないlineがあったら削除してポップがでてたらそれも消す
+  var unConnectedLine = document.querySelector('.unconnected-line');
+  if(unConnectedLine){
+    unConnectedLine.parentNode.removeChild(unConnectedLine);
     var pop = document.querySelector('wrap-pop-after-drag');
     pop.classList.remove('show-pop');
 
-    var nodeId = unsavedLine.id.split('-')[1];
-    var node = getNodeFromScenarioById(nodeId);
+    var nodeId = unConnectedLine.id.split('-')[1];
+    var node = scenarioGetContent(scenarioArray, nodeId);
     delete node.topLineId;
     delete node.topLinePosition;
   }
@@ -356,23 +361,19 @@ var mdownOnLineStart = function(e){
 
 var moveOnLineStart = function(e){
   
-  if(e.type === "mousemove") {
-    var event = e;
-  } else {
-    var event = e.changedTouches[0];
-  }
+  // タッチデイベントとマウスのイベントの差異を吸収
+  var event = (e.type == "mousemove") ? e : e.changedTouches[0];
 
   // lineの終点の取得
-  // インスペクタの大きさ分を考慮
-  //var leftOffset = document.querySelector('inspector').offsetWidth;
-  arrowTo.x = e.pageX + canvas.scrollLeft; //- leftOffset;
-  arrowTo.y = e.pageY + canvas.scrollTop - 48;
+  var headerHeight = 48;
+  arrowTo.x = e.pageX + canvas.scrollLeft;
+  arrowTo.y = e.pageY + canvas.scrollTop - headerHeight;
 
   // プレヴュー用のlineを表示
   var lineForPreview = document.querySelector('#lineForPreview');
   lineForPreview.classList.add('show');
-  lineForPreview.setAttribute('x1', arrowOrigin.x);
-  lineForPreview.setAttribute('y1', arrowOrigin.y);
+  lineForPreview.setAttribute('x1', arrowFrom.x);
+  lineForPreview.setAttribute('y1', arrowFrom.y);
   lineForPreview.setAttribute('x2', arrowTo.x);
   lineForPreview.setAttribute('y2', arrowTo.y);
   lineForPreview.setAttribute('stroke', '#1976d2');
@@ -391,22 +392,19 @@ var upOnLineStart = function(e){
   lineForPreview.classList.remove('show');
 
   // 次のテンプレートにつなぐlineを追加
-  var topLine = addLine(arrowOrigin, arrowTo, targetEvent.id);
-  topLine.classList.add('unsaved');
+  var topLine = addLine(arrowFrom, arrowTo, targetEvent.id);
+  topLine.classList.add('unconnected-line');
 
 
   if(targetEvent.nodeType=='single' || targetEvent.nodeType=='point'){
-    // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
+    // 前に描画したtoplineがあるなら削除
     var preTopLine = document.querySelector(`#${targetEvent.gui.topLineId}`);
     if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
 
     topLine.setAttribute('id', 'line-'+targetEvent.id);
+    
+    targetEvent.topLineId = 'line-'+targetEvent.id;
     targetEvent.gui.topLineId = 'line-'+targetEvent.id;
-
-    var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-    var to = {x: arrowTo.x, y: arrowTo.y};
-
-    targetEvent.gui.topLinePosition = {origin: from, to: to};
 
   }else if(targetEvent.nodeType=='group'){
     var selections = targetEvent.selections;
@@ -417,22 +415,16 @@ var upOnLineStart = function(e){
         if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
 
         topLine.setAttribute('id', 'line-'+targetSelectionEventId);
-        //selections[i].topLine = topLine;
         selections[i].topLineId = 'line-'+targetSelectionEventId;
-
-        // topLinePositionを追加
-        var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-        var to = {x: arrowTo.x, y: arrowTo.y};
-
-        selections[i].topLinePosition = {origin: from, to: to};
       }
     } // for()
   }
 
+  scenarioUpdateContent(scenarioArray, targetEvent.id, targetEvent);
+
 
   // ドラッグしているマウスがtemplateの上ならそのテンプレートとイベントをつなげる
   if(isOverTemplate){
-
     // topLineの終点をマウスオーバーしているテンプレートの座標に修正
     var elemX = parseInt(overTemplateElm.style.left);
     var elemY = parseInt(overTemplateElm.style.top);
@@ -440,25 +432,20 @@ var upOnLineStart = function(e){
     topLine.setAttribute('x2', elemX);
     topLine.setAttribute('y2', elemY + offsetY);
 
-
     // nextイベントをマウスオーバーしているテンプレートのイベントに紐付け
     if(targetEvent.nodeType=='single' || targetEvent.nodeType=='point'){
 
-      targetEvent.next = idOfOverTemplate;
-      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-      var to = {x: elemX, y: elemY + offsetY};
-      targetEvent.gui.topLinePosition = {origin: from, to: to};
-      targetEvent.topLineId = `line-${targetId}`;
+      scenarioConnectFromSingleNode(targetEvent, idOfOverTemplate);
+      //targetEvent.topLineId = `line-${targetEvent.id}`;
 
     }else if(targetEvent.nodeType=='group'){
+
+      scenarioConnectFromGroupNode(targetEvent, idOfOverTemplate);
 
       for(var i=0; i<targetEvent.selections.length; i++){
         if(targetEvent.selections[i].id==targetSelectionEventId){
           targetEvent.selections[i].next = idOfOverTemplate;
-          var from = {x: arrowOrigin.x, y: arrowOrigin.y};
-          var to = {x: elemX, y: elemY + offsetY};
-          targetEvent.selections[i].topLinePosition = {origin: from, to: to};
-          targetEvent.selections[i].topLineId = `line-${selections[i].id}`;
+          //targetEvent.selections[i].topLineId = `line-${selections[i].id}`;
         }
       }
 
@@ -477,7 +464,6 @@ var upOnLineStart = function(e){
     var popOffset = pop.offsetHeight/2; //= 66.5/2;
     pop.style.left = `${arrowTo.x}px`;
     pop.style.top = `${arrowTo.y - popOffset}px`;
-
   }
 
   document.body.removeEventListener("mousemove", moveOnLineStart, false);
@@ -496,7 +482,7 @@ var goToFrom, goToFromId; // goToNodeを作ろうとした時の派生元のノ�
 
 var clickOnNode = function(e){
 
-  targetId = $(e.target).parents('.node')[0].dataset.id;
+  var targetId = $(e.target).parents('.node')[0].dataset.id;
   targetEvent = getEventFromScenarioById(targetId);
   
   // ノードにフォーカスする

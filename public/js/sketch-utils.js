@@ -5,8 +5,8 @@ var scenarioHistories = [];
 // scenarioのセーブ
 async function saveScenarioAsSubcollection(scenarioObj){
 
-  var unsavedLine = document.querySelector('.unsaved');
-  if(unsavedLine) unsavedLine.classList.remove('unsaved');
+  var unConnectedLine = document.querySelector('.unconnected-line');
+  if(unConnectedLine) unConnectedLine.classList.remove('unconnected-line');
 
   scenarioHistoriesAddHistory(scenarioHistories, scenarioArray);
 
@@ -22,7 +22,7 @@ async function saveScenarioAsSubcollection(scenarioObj){
 
     // 存在しなければ追加する
     if(!(doc.exists)){
-      service.db.collection('projects').doc(riot.currentProjectId)
+      await service.db.collection('projects').doc(riot.currentProjectId)
         .collection('scenario')
         .doc(scenarioObj.id)
         .set(scenarioObj);
@@ -36,11 +36,11 @@ async function saveScenarioAsSubcollection(scenarioObj){
     .then(function(doc) {
       var resultScenario = [];     
       for(var i=0; i<doc.docs.length; i++){
-        //var data = doc.docs[i].data();
         resultScenario.push(doc.docs[i].data());
       }
       return resultScenario;
     });
+
 
   // クライアントの持つシナリオとデータベースのシナリオを比較して異なるものだけを更新する
   for(var i=0; i<scenarioOfDatabase.length; i++){
@@ -60,10 +60,13 @@ async function saveScenarioAsSubcollection(scenarioObj){
 
     // 差があるイベントについてはクライアントに合わせて更新
     if(JSON.stringify(scenarioOfDatabase[i]) != JSON.stringify(eventOfClient)){
-      service.db.collection('projects').doc(riot.currentProjectId)
+      var doc = await service.db.collection('projects').doc(riot.currentProjectId)
         .collection('scenario')
         .doc(eventOfClient.id)
-        .update(eventOfClient);
+        .set(eventOfClient)
+        .then(function(doc) {
+          return doc;
+        });
       //console.log('save to sub: ', eventOfClient);
     }
 

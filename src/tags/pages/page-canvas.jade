@@ -72,7 +72,7 @@ page-canvas
     }
 
     this.reloadPreview = function(){
-      var firstEventName = getEventFromScenarioById(`start-point-${riot.currentScenarioId}`).next;
+      var firstEventName = scenarioGetContent(scenarioArray, `start-point-${riot.currentScenarioId}`).next;
       initConversation(firstEventName);
     }
 

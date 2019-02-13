@@ -234,7 +234,10 @@ item-selection-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' da
       // nodeの座標をtopLineが中心になるように修正
       var content = getEventFromScenarioById(self.id);
       var preNodePosY = content.gui.position.y;
-      content.gui.position.y = preNodePosY - gapY/2;
+      scenarioUpdatePosition(scenarioArray, content.id, {
+        x: content.gui.position.x,
+        y: preNodePosY - gapY/2,
+      });
       node.style.top = content.gui.position.y + 'px';
 
       // 全てのtopLineの修正　
@@ -246,21 +249,14 @@ item-selection-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' da
         if(topLine){
           var preY = parseInt(topLine.getAttribute('y1'));
           var y = preY + gapY/2;
-          //debugger
           topLine.setAttribute('y1', y);
-          selections[i].topLinePosition.origin.y = y;
-        }
-      }
-
-      // 変更をscenarioArrayに反映して保存
-      for(var i=0; i<scenarioArray.length; i++){
-        if(scenarioArray[i].id==content.id){
-          scenarioArray[i] = content;
         }
       }
 
       // textをシナリオデータに反映
       content.text = e.target.value;
+
+      scenarioUpdateContent(scenarioArray, content.id, content);
 
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);

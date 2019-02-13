@@ -32,12 +32,12 @@ atom-add-selection
       var preHeight = parentGroup.offsetHeight;
 
       // ノードを追加
-      self.content.addedSelectionsCounter++;
+      scenarioIncrementSelectionCounter(scenarioArray, self.content.id);
       var contentToAdd = {
         label: 'Selection',
         id: `selectionTmp${self.content.num}-selection${self.content.addedSelectionsCounter}`,
       };
-      self.content.selections.push(contentToAdd);
+      scenarioAddSelectionToSelectionNode(scenarioArray, self.content.id, contentToAdd)
       riot.update();
 
       // フォーカスする
@@ -51,7 +51,7 @@ atom-add-selection
       var gapY = parentGroup.offsetHeight - preHeight;
 
       // parentGroup
-      var content = getEventFromScenarioById(parentGroup.id);
+      var content = scenarioGetContent(scenarioArray, parentGroup.id);
       var preNodePosY = content.gui.position.y;
       content.gui.position.y = preNodePosY - gapY/2;
       parentGroup.style.top = content.gui.position.y + 'px';
@@ -60,10 +60,11 @@ atom-add-selection
       var selections = content.selections;
       for(var i=0; i<selections.length; i++){
         if(selections[i].next){
-          var topLineId = selections[i].topLineId;
-          var topLine = document.getElementById(topLineId);
+          //var topLineId = selections[i].topLineId;
+          var id = scenarioSelectionGetId(selections, i);
+          var topLine = document.getElementById(`line-${id}`);
 
-          var selectionNode = document.getElementById(selections[i].id);
+          var selectionNode = document.getElementById(id);
 
           var dragButton = selectionNode.children[2];
           var absoluteTop = dragButton.getBoundingClientRect().top;
@@ -73,8 +74,7 @@ atom-add-selection
           if(topLine) topLine.setAttribute('y1', y);
         }
 
-        if(self.id==selections[i].id) self.selectionIndex = i;
-
+        if(self.id==id) self.selectionIndex = i;
       }
 
     }

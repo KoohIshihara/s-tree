@@ -28,11 +28,10 @@ atom-delete-node
         e.preventDefault();
         e.stopPropagation();
       }
-
-      //this.event = getEventFromScenarioById(this.id);
-
+      
       // singleとgroupそれぞれに対して、nextを持つ全てのnodeのデータを消去して、GUIから要素を消去
-      var preIndexesOfNomalNodes = getIndexesOfNormalNodesFromScenarioByNext(id);
+      //scenarioDisconnectNormalNode(scenarioArray, id);
+      var preIndexesOfNomalNodes = scenarioGetNormalNodeIndexesThatConnectTo(scenarioArray, id);
       for(var i=0; i<preIndexesOfNomalNodes.length; i++){
         var index = preIndexesOfNomalNodes[i];
 
@@ -40,17 +39,15 @@ atom-delete-node
         var line = document.getElementById(lineName);
         if(line) line.parentNode.removeChild(line);
 
-        delete scenarioArray[index.scenarioIndex].next;
-        delete scenarioArray[index.scenarioIndex].gui.topLineId;
+        scenarioDisconnectNormalNodeByIndex(scenarioArray, index.scenarioIndex);
+        //delete scenarioArray[index.scenarioIndex].next;
+        //delete scenarioArray[index.scenarioIndex].topLineId;
+        //delete scenarioArray[index.scenarioIndex].gui.topLineId;
       }
-
-      // deleteをentitiesで書き換えてるところ debugger
-      var singleNodes = scenarioGetNodesThatConnectTo(scenarioArray, id);
-      for(var i=0; i<singleNodes; i++){
-
-      }
-
-      var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(id);
+      
+      // deleteをentitiesで書き換えてるところ
+      // scenarioDisconnectSelectionsNode(scenarioArray, id);
+      var preIndexesOfSelectionNodes = scenarioGetSelectionIndexesThatConnectTo(scenarioArray, id);
       for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
         var index = preIndexesOfSelectionNodes[i];
 
@@ -58,13 +55,14 @@ atom-delete-node
         var line = document.getElementById(lineName);
         if(line) line.parentNode.removeChild(line);
 
-        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].next;
-        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLineId;
+        scenarioDisconnectSelectionsNodeByIndex(scenarioArray, index.scenarioIndex, index.selectionIndex);
+        //delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].next;
+        //delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLineId;
       }
 
 
       // 自身のイベントデータと要素を消去
-      var selfNode = getEventFromScenarioById(id);
+      var selfNode = scenarioGetEventById(scenarioArray, id);
       
       if(selfNode.nodeType=='single'){
 
@@ -83,17 +81,13 @@ atom-delete-node
 
       }
 
-      var node = document.getElementById(selfNode.id);
+      var node = document.getElementById(id);
       node.parentNode.removeChild(node);
 
-      var selfNodeIndex;
-      for(var i=0; i<scenarioArray.length; i++){
-        if(selfNode.id==scenarioArray[i].id) selfNodeIndex = i
-      }
-      scenarioArray.splice(selfNodeIndex, 1);
+      scenarioDeleteNode(scenarioArray, id);
 
       // gotoのイベントのtoIdに指定されていた場合はリンクしているgotoも削除
-      var gotoEvents = getEventOfGoToByToId(id);
+      var gotoEvents = scenarioGetGoToEventsThatJumpTo(scenarioArray, id);;
       for(var i=0; i<gotoEvents.length; i++){
         this.deleteNode(gotoEvents[i].id);
       }
@@ -104,8 +98,8 @@ atom-delete-node
 
 
       // uponNodeでセーブされてしまうのでここではいったん関数を呼ばない
-      //saveScenarioAsSubcollection();
-      //saveScenario();
+      // saveScenarioAsSubcollection();
+
     } // deleteNode
 
 

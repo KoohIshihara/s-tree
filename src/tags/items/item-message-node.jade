@@ -1,22 +1,14 @@
 item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').node
   div.wrap-node
     div.wrap-node-content.f.fm.flex-between.py4
-      //p.text.line-clamp-1.pl12.pr8.pt8.pb7 
       textarea(onkeyup='{updateText.bind(e, this)}').textarea.px12 {text}
       p.text.hidden-text.px12 {text}
-      //div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
-        div.drag-button
   div.wrap-drag-button.f.fm
     div(onmousedown='{down}').drag-button
   div.wrap-num
     p {num}
   div.wrap-icon.f.fh
     atom-delete-node(id='{id}')
-    //atom-delete-node(id='{id}' if='{!(ifFirstNode)}')
-  //div(if='{ifFirstNode}').start-node-overlay
-    p.py12 Start Node
-
-
 
   style(scoped, type='less').
     :scope {
@@ -242,42 +234,34 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
       var gapY = node.offsetHeight - preHeight;
 
       // nodeの座標をtopLineが中心になるように修正
-      var content = getEventFromScenarioById(self.id);
+      var content = scenarioGetContent(scenarioArray, self.id);
       var preNodePosY = content.gui.position.y;
 
-      var y = preNodePosY - gapY/2;
-      content.gui.position.y = y;
+      scenarioUpdatePosition(scenarioArray, content.id, {
+        x: content.gui.position.x,
+        y: preNodePosY - gapY/2,
+      });
       node.style.top = `${y}px`;
 
       // topLineの修正
       var topLine = document.getElementById(`line-${content.id}`);
       if(topLine){
         var preX = parseInt(topLine.getAttribute('x1'));
-        //var preY = parseInt(topLine.getAttribute('y1'));
         var x = preX + gapX;
-        //var y = preY + gapY/2;
         topLine.setAttribute('x1', x);
-        //topLine.setAttribute('y1', y);
-        content.gui.topLinePosition.origin.x = x;
-      }
-
-      // 変更をscenarioArrayに反映して保存
-      for(var i=0; i<scenarioArray.length; i++){
-        if(scenarioArray[i].id==content.id){
-          scenarioArray[i] = content;
-        }
       }
 
       // textをシナリオデータに反映
       content.text = e.target.value;
+
+      // 変更をscenarioArrayに反映して保存
+      scenarioUpdateContent(scenarioArray, content.id, content);
 
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);
       self.saveTimer = setTimeout(function(){
         saveScenarioAsSubcollection(self.content);
       }, 800);
-
-
 
     }
 

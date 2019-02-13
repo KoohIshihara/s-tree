@@ -28,7 +28,6 @@ var loadNode = function(x, y, content, tagName){
   nodeAsDom.style.top = `${y}px`;
 }
 
-
 // ノードをcanvasに追加する
 var addNode = function(x, y, content, tagName){ 
   var nodeAsDom = createNodeAsDom(tagName, content);

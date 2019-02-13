@@ -1,5 +1,9 @@
 // scenario
-var module = {};
+var scenarioArray;
+
+function scenarioGetContentByIndex(scenario, index) {
+  return scenario[index];
+}
 
 function scenarioGetContent(scenario, id) {
   for (var i = 0; i < scenario.length; i++) {
@@ -20,38 +24,65 @@ function scenarioAddContent(scenario, content) {
 
 function scenarioConnectFromSingleNode(from, toId) {
   from.next = toId;
+  from.topLineId = `line-${from.id}`;
+  from.gui.topLineId = `line-${from.id}`;
 }
 
 
-function scenarioConnectFromGroupNode(from, toId) {
+function scenarioConnectFromGroupNode(from, toId, selectionsNum) {
   var selections = from.selections;
   for(var i=0; i<selections.length; i++){
     if(selections[i].id==targetSelectionEventId){
       selections[i].next = toId;
+      //selections[i].topLineId = `line-${selections[i].id}`;
       break;
     }
   }
   from.selections = selections;
 }
-// kooh--------------------
-
-
-// TO DOあるidのnextを持つsingle nodeを取り出す
-
-
-// TO DOあるidのnextを持つgroup nodeを取り出す
+// --------------------
 
 
 
 function scenarioUpdateContent(scenario, id, content) {
-    for (var i = 0; i < scenario.length; i++) {
-        if (scenario[i].id == id) {
-            scenario[i] = content;
-            break;  // Was missing in Ko-chan's code
-        }
+  for (var i = 0; i < scenario.length; i++) {
+    if (scenario[i].id == id) {
+      scenario[i] = content;
+      break;  // Was missing in Ko-chan's code
     }
+  }
 }
 //module.exports.scenarioUpdateContent = scenarioUpdateContent;
+
+// kooh--------------------
+function scenarioUpdatePosition(scenario, id, position) {
+  for (var i = 0; i < scenario.length; i++) {
+    if (scenario[i].id == id) {
+      scenario[i].gui.position = position;
+      break;  // Was missing in Ko-chan's code
+    }
+  }
+}
+
+function scenarioIncrementSelectionCounter(scenario, id) {
+  for (var i = 0; i < scenario.length; i++) {
+    if (scenario[i].id == id) {
+      scenario[i].addedSelectionsCounter++;
+      break;
+    }
+  }
+}
+
+function scenarioAddSelectionToSelectionNode(scenario, id, content) {
+  for (var i = 0; i < scenario.length; i++) {
+    if (scenario[i].id == id) {
+      scenario[i].selections.push(content);
+      break;
+    }
+  }
+}
+
+// --------------------
 
 function scenarioGetSize(scenario) {
     return scenario.length;
@@ -67,17 +98,40 @@ function scenarioGetId(scenario, index) {
 }
 //module.exports.scenarioGetId = scenarioGetId;
 
+function scenarioGetNext(scenario, index) {
+  return scenario[index].next;
+}
+//module.exports.scenarioGetId = scenarioGetId;
+
+function scenarioSelectionGetId(selections, index) {
+  return selections[index].id;
+}
+//module.exports.scenarioSelectionGetId = scenarioSelectionGetId;
+
+function scenarioSelectionGetNext(selections, index) {
+  return selections[index].next;
+}
+//module.exports.scenarioSelectionGetNext = scenarioSelectionGetNext;
+
 function scenarioDeleteNode(scenario, id) {
-    for (var i = 0; i < scenario.length; i++) {
-        if (scenario[i].id == id) {
-            scenario.splice(i, 1);
-            break;
-        }
+  for (var i = 0; i < scenario.length; i++) {
+    if (scenario[i].id == id) {
+      scenario.splice(i, 1);
+      break;
     }
+  }
 }
 //module.exports.scenarioDeleteNode = scenarioDeleteNode;
 
-
+// kooh-----------
+function scenarioDeleteSelection(selections, id) {
+  for(var i=0; i<selections.length; i++){
+    if(selections[i].id == id){
+      selections.splice(i, 1);
+    }
+  }
+}
+// -----------
 
 function _disconnectNode(node) {
   delete node.next;
@@ -86,7 +140,7 @@ function _disconnectNode(node) {
 
 function scenarioDisconnectNormalNode(scenario, id) {
   for (var i = 0; i < scenario.length; i++) {
-    if (scenario[i].nodeType == 'single' && scenario[i].next == id) {
+    if ((scenario[i].nodeType == 'single' || scenario[i].nodeType == 'point') && scenario[i].next == id) {
       delete scenario[i].next;
       delete scenario[i].gui.topLineId;
     }
@@ -108,6 +162,19 @@ function scenarioDisconnectSelectionsNode(scenario, id) {
   }
 }
 //module.exports.scenarioDisconnectSelectionsNode = scenarioDisconnectSelectionsNode;
+
+// kooh-----------------------------
+function scenarioDisconnectNormalNodeByIndex(scenario, i) {
+  delete scenario[i].next;
+  delete scenario[i].gui.topLineId;
+}
+
+function scenarioDisconnectSelectionsNodeByIndex(scenario, i, j) {  
+  delete scenario[i].selections[j].next;
+  delete scenario[i].selections[j].topLineId;
+}
+// -----------------------------
+
 
 function scenarioGetEventById(scenario, id) {
   var event = null;
@@ -147,7 +214,7 @@ function scenarioGetNodeById(scenario, id) {
 function scenarioGetNodesThatConnectTo(scenario, id) {
   var nodes = [];
   for (var i = 0; i < scenario.length; i++) {
-    if (scenario[i].nodeType == 'single' && scenario[i].next == id) {
+    if ((scenario[i].nodeType == 'single' || scenarioArray[i].nodeType=='point') && scenario[i].next == id) {
       nodes.push(scenario[i]);
     }
   }
@@ -213,6 +280,33 @@ function scenarioGetGoToEventsThatJumpTo(scenario, id) {
 }
 //module.exports.scenarioGetGoToEventsThatJumpTo = scenarioGetGoToEventsThatJumpTo;
 
+function scenarioIsSingle(scenario, index) {
+  return scenario[index].nodeType == 'single';
+}
+
+function scenarioIsGroup(scenario, index) {
+  return scenario[index].nodeType == 'group';
+}
+
+function scenarioIsPoint(scenario, index) {
+  return scenario[index].nodeType == 'point';
+}
+
+function scenarioIsNormal(scenario, index) {
+  return scenario[index].type == 'normal';
+}
+
+function scenarioIsOpenQuestion(scenario, index) {
+  return scenario[index].type == 'openquestion';
+}
+
+function scenarioIsGoTo(scenario, index) {
+  return scenario[index].type == 'goto';
+}
+
+function scenarioIsGoToAnotherProject(scenario, index) {
+  return scenario[index].type == 'gotoAnotherProject';
+}
 
 
 
@@ -247,3 +341,92 @@ function scenarioHistoriesGetHistory(scenarioHistory, index) {
   return scenarioHistory[scenarioHistory.length - index];
 }
 //module.exports.scenarioHistoriesGetHistory = scenarioHistoriesGetHistory;
+
+
+
+// Drawing
+
+function scenarioDrawNodes(scenario, drawNode) {
+  for (var i = 0; i < scenario.length; i++) {
+    drawNode(scenario, i);
+  }
+}
+
+function scenarioDrawLines(scenario, drawLine) {
+  for (var i = 0; i < scenario.length; i++) {
+    drawLine(scenario, i);
+  }
+}
+
+function scenarioGetNodePosition(scenario, index) {
+  return scenario[index].gui.position;
+}
+
+function scenarioGetTopLinePosition(scenario, index) {
+  return scenario[index].gui.topLinePosition;
+}
+
+function scenarioGetTopLineId(scenario, index) {
+  return scenario[index].gui.topLineId;
+}
+
+function scenarioGroupDrawLines(scenario, index, drawLine) {
+  var selections = scenario[index].selections;
+  for (var i = 0; i < selections.length; i++) {
+    drawLine(selections, i);
+  }
+}
+
+function scenarioSelectionGetTopLinePosition(selections, index) {
+  return selections[index].topLinePosition;
+}
+
+function scenarioSelectionGetTopLineId(selections, index) {
+  return selections[index].topLineId;
+}
+
+
+
+// export
+
+function scenarioGetAllSelectionNode(scenario) {
+
+  var nodes = [];
+  for(var i=0; i<scenario.length; i++){
+    if(scenario[i].type == 'selection'){
+      nodes.push(scenario[i]);
+    }
+  }
+
+  return nodes;
+
+}
+
+function scenarioGetAllSelections(scenario) {
+
+  var allSelections = [];
+  for(var i=0; i<scenario.length; i++){
+    if(scenario[i].type == 'selection'){
+      var selections = scenario[i].selections;
+      for(var j=0; j<selections.length; j++){
+        allSelections.push(selections[j]);
+      }
+    }
+  }
+
+  return selections;
+
+}
+
+function scenarioGetOpenQuestionNode(scenario) {
+
+  var nodes = [];
+  for(var i=0; i<scenario.length; i++){
+    if(scenario[i].type == 'openquestion'){
+      nodes.push(scenario[i]);
+    }
+  }
+
+  return nodes;
+
+}

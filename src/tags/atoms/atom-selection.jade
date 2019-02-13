@@ -1,5 +1,4 @@
 atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
-  //p.pl12.pr8 {label}
   textarea(onkeyup='{updateSelectionText.bind(e, this)}').selection-textarea.px8 {label}
   p.hidden-label.px8 {label}
   div.wrap-drag-button.f.fm
@@ -102,19 +101,13 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
         if(self.letDeleteSelf){
 
           // selectionのデータを削除
-          var selection = getNodeFromScenarioById(self.id);
-          var groupId = selection.id.split('-')[0];
-          var event = getEventFromScenarioById(groupId);
+          var groupId = self.id.split('-')[0];
+          var parentContent = scenarioGetContent(scenarioArray, groupId);
 
-          for(var i=0; i<event.selections.length; i++){
-            if(event.selections[i].id == self.id){
-              event.selections.splice(i, 1);
-            }
-          }
-
+          scenarioDeleteSelection(parentContent.selections, self.id);
 
           // 位置ずれを修正
-          var parentGroup = $(self.root).parents('.node')[0];
+          var parentGroup = document.getElementById(groupId); //$(self.root).parents('.node')[0];
           
           var preWidth = parentGroup.offsetWidth;
           var preHeight = parentGroup.offsetHeight;
@@ -130,31 +123,29 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
           var gapY = parentGroup.offsetHeight - preHeight;
 
           // parentGroup
-          var content = getEventFromScenarioById(parentGroup.id);
-          var preNodePosY = content.gui.position.y;
-          content.gui.position.y = preNodePosY - gapY/2;
-          parentGroup.style.top = content.gui.position.y + 'px';
+          var preNodePosY = parentContent.gui.position.y;
+          //parentContent.gui.position.y = preNodePosY - gapY/2;
+          scenarioUpdatePosition(scenarioArray, targetEvent.id, {
+            x: parentContent.gui.position.x,
+            y: preNodePosY - gapY/2
+          });
+          parentGroup.style.top = `${parentContent.gui.position.y}px`;
 
           // 全てのtopLineの修正　
-          var selections = content.selections;
+          var selections = parentContent.selections;
           for(var i=0; i<selections.length; i++){
             if(selections[i].next){
               var topLineId = selections[i].topLineId;
               var topLine = document.getElementById(topLineId);
 
-              var groupId = parentGroup.id;
-              var groupEvent = getEventFromScenarioById(groupId);
+              var relativePos = $(`#${selections[i].id}`).position();
 
-              var selection = selections[i];
-              var relativePos = $(`#${selection.id}`).position();
-
-              var nodeOfSelection = document.getElementById(selection.id);
+              var nodeOfSelection = document.getElementById(selections[i].id);
               var boundingRect = nodeOfSelection.getBoundingClientRect();
 
-              var y = groupEvent.gui.position.y + relativePos.top + boundingRect.height/2;
+              var y = parentContent.gui.position.y + relativePos.top + boundingRect.height/2;
 
               topLine.setAttribute('y1', y);
-              selections[i].topLinePosition.origin.y = y;
             }
 
             if(self.id==selections[i].id) self.selectionIndex = i;
@@ -162,12 +153,11 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
 
 
           // 一個前の選択肢をフォーカス
-          var preSelection = event.selections[event.selections.length-1];
+          var preSelection = parentContent.selections[parentContent.selections.length-1];
           if(preSelection){
             var preNode = document.getElementById(preSelection.id);
             preNode.firstChild.focus();
           }
-
 
           return;
         }
@@ -197,9 +187,13 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
       var gapY = parentGroup.offsetHeight - preHeight;
 
       // parentGroup
-      var content = getEventFromScenarioById(parentGroup.id);
+      var content = scenarioGetContent(scenarioArray, parentGroup.id); //getEventFromScenarioById(parentGroup.id);
       var preNodePosY = content.gui.position.y;
-      content.gui.position.y = preNodePosY - gapY/2;
+      //content.gui.position.y = preNodePosY - gapY/2;
+      scenarioUpdatePosition(scenarioArray, targetEvent.id, {
+        x: targetEvent.gui.position.x,
+        y: preNodePosY - gapY/2
+      });
       parentGroup.style.top = content.gui.position.y + 'px';
 
       // 全てのtopLineの修正
@@ -227,14 +221,7 @@ atom-selection(id='{id}').wrap-atom.wrap-text.f.fm.flex-between.py8
       }
 
       content.selections[self.selectionIndex].label = e.target.value;
-
-      // 変更をscenarioArrayに反映して保存
-      for(var i=0; i<scenarioArray.length; i++){
-        if(scenarioArray[i].id==content.id){
-          scenarioArray[i] = content;
-        }
-      }      
-      
+      scenarioUpdateContent(scenarioArray, content.id, content);  
 
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);
