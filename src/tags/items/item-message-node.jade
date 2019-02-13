@@ -241,7 +241,7 @@ item-message-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='
         x: content.gui.position.x,
         y: preNodePosY - gapY/2,
       });
-      node.style.top = `${y}px`;
+      node.style.top = `${preNodePosY - gapY/2}px`;
 
       // topLineの修正
       var topLine = document.getElementById(`line-${content.id}`);
